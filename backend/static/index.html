@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚜 Maharashtra Farmer Advisory System</title>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+    <div class="app-container">
+        <header>
+            <div class="logo-container">🌾</div>
+            <h1>Farmer Advisory System</h1>
+            <p class="subtitle">Supporting Maharashtra's Farmers with AI-Powered Expert Advice</p>
+        </header>
+
+        <div class="advisor-form">
+            <div class="input-field">
+                <label for="language">Select Language / भाषा निवडा</label>
+                <select id="language">
+                    <option value="eng_Latn">English</option>
+                    <option value="mar_Deva">Marathi / मराठी</option>
+                    <option value="hin_Deva">Hindi / हिंदी</option>
+                </select>
+            </div>
+
+            <div class="input-field">
+                <label for="query">Ask your question / आपला प्रश्न विचारा</label>
+                <textarea id="query" rows="4" placeholder="e.g. कापूस पिकावर पडणाऱ्या लाल्या रोगावर उपाय काय?"></textarea>
+            </div>
+
+            <button class="submit-btn" id="submitBtn" onclick="askQuery()">Get Expert Advice / सल्ला मिळवा</button>
+        </div>
+
+        <div id="loader" class="loader-container">
+            <div class="spinner"></div>
+            <p>Consulting our knowledge base...</p>
+        </div>
+
+        <div id="resultsArea" class="results-area">
+            <div class="response-card">
+                <h2>💡 Expert Advice</h2>
+                <div id="answer" class="answer-content"></div>
+                
+                <div class="sources-container">
+                    <label>📚 Information Sources:</label>
+                    <div id="sourcesList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        async function askQuery() {
+            const query = document.getElementById('query').value;
+            const lang = document.getElementById('language').value;
+            const submitBtn = document.getElementById('submitBtn');
+            const loader = document.getElementById('loader');
+            const resultsArea = document.getElementById('resultsArea');
+            const answerDiv = document.getElementById('answer');
+            const sourcesList = document.getElementById('sourcesList');
+            
+            if (!query) {
+                alert("Please enter a question.");
+                return;
+            }
+
+            // UI State: Loading
+            submitBtn.disabled = true;
+            submitBtn.innerText = "Processing...";
+            loader.style.display = 'block';
+            resultsArea.style.display = 'none';
+
+            try {
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_input: query, language: lang })
+                });
+
+                const data = await response.json();
+                
+                if (response.ok) {
+                    answerDiv.innerText = data.answer;
+                    
+                    // Render sources as tags
+                    sourcesList.innerHTML = '';
+                    if (data.sources && data.sources.length > 0) {
+                        data.sources.forEach(source => {
+                            const tag = document.createElement('span');
+                            tag.className = 'source-tag';
+                            tag.innerText = source;
+                            sourcesList.appendChild(tag);
+                        });
+                    } else {
+                        sourcesList.innerText = 'Official Knowledge Base';
+                    }
+                    
+                    resultsArea.style.display = 'block';
+                    // Scroll to results
+                    resultsArea.scrollIntoView({ behavior: 'smooth' });
+                } else {
+                    alert("Error: " + (data.detail || "Something went wrong on our end."));
+                }
+            } catch (err) {
+                alert("Connection failed. Please ensure the backend is running at http://127.0.0.1:8000");
+            } finally {
+                submitBtn.disabled = false;
+                submitBtn.innerText = "Get Expert Advice / सल्ला मिळवा";
+                loader.style.display = 'none';
+            }
+        }
+
+        // Allow Enter key to submit
+        document.getElementById('query').addEventListener('keydown', function(e) {
+            if (e.key === 'Enter' && !e.shiftKey) {
+                e.preventDefault();
+                askQuery();
+            }
+        });
+    </script>
+</body>
+</html>

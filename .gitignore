@@ -1,0 +1,32 @@
+# Environment files
+.env
+.env.local
+.env.*
+
+# Python Cache
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environments
+venv/
+.venv/
+env/
+ENV/
+
+# Databases & Vector DBs
+chroma/
+*.db
+*.sqlite3
+
+# OS / IDE / Temp files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.log
+temp_diagnosis_*.jpg
+temp_*.jpg
+temp_*.png
+temp_*.jpeg
+streamlit_log.txt

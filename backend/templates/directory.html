@@ -1,0 +1,152 @@
+{% extends "base.html" %}
+{% block title %}Expert Directory | Maha-Advisory{% endblock %}
+
+{% block content %}
+<div class="dir-page">
+    <div class="header-section">
+        <h2><i class="fa-solid fa-address-book" style="color:var(--gov-orange)"></i> Expert & Help Directory</h2>
+        <p>Find verified contacts for government agricultural offices, helplines, and Krishi Vigyan Kendras in Maharashtra.</p>
+    </div>
+
+    <div class="search-bar">
+        <i class="fa-solid fa-search"></i>
+        <input type="text" id="dirSearch" placeholder="Search by district, department or service..." oninput="filterDirectory()">
+    </div>
+
+    <div id="dirGrid" class="dir-grid">
+
+        <!-- National Helplines -->
+        <div class="dir-card" data-tags="national helpline kisan pm farmer">
+            <div class="dir-card-header national-header"><i class="fa-solid fa-phone-volume"></i> National Farmer Helplines</div>
+            <div class="dir-card-body">
+                <div class="contact-row"><span class="contact-name">PM-Kisan Helpline</span><span class="contact-val"><a href="tel:155261">155261</a></span></div>
+                <div class="contact-row"><span class="contact-name">Kisan Call Centre</span><span class="contact-val"><a href="tel:1800180155">1800-180-1551</a></span></div>
+                <div class="contact-row"><span class="contact-name">Soil Health Card</span><span class="contact-val"><a href="tel:18001801551">1800-180-1551</a></span></div>
+                <div class="contact-row"><span class="contact-name">PMFBY (Crop Ins.)</span><span class="contact-val"><a href="tel:18002660700">1800-200-7710</a></span></div>
+                <div class="contact-row"><span class="contact-name">NABARD Rural</span><span class="contact-val"><a href="tel:022-26539895">022-2653-9895</a></span></div>
+            </div>
+        </div>
+
+        <!-- Maharashtra State -->
+        <div class="dir-card" data-tags="maharashtra state pune krishi agriculture department">
+            <div class="dir-card-header state-header"><i class="fa-solid fa-building-columns"></i> Maharashtra Agriculture Dept.</div>
+            <div class="dir-card-body">
+                <div class="contact-row"><span class="contact-name">Main Office (Pune)</span><span class="contact-val"><a href="tel:02026127680">020-2612-7680</a></span></div>
+                <div class="contact-row"><span class="contact-name">Agriculture Commissioner</span><span class="contact-val"><a href="tel:02026059000">020-2605-9000</a></span></div>
+                <div class="contact-row"><span class="contact-name">Agri. Portal Helpdesk</span><span class="contact-val"><a href="tel:18001234567">1800-233-4000</a></span></div>
+                <div class="contact-row"><span class="contact-name">Online Portal</span><span class="contact-val"><a href="https://krishi.maharashtra.gov.in" target="_blank">krishi.maharashtra.gov.in</a></span></div>
+            </div>
+        </div>
+
+        <!-- KVK - Nashik -->
+        <div class="dir-card" data-tags="kvk nashik krishi vigyan kendra research">
+            <div class="dir-card-header kvk-header"><i class="fa-solid fa-flask"></i> KVK Nashik</div>
+            <div class="dir-card-body">
+                <div class="contact-row"><span class="contact-name">District</span><span class="contact-val">Nashik</span></div>
+                <div class="contact-row"><span class="contact-name">Phone</span><span class="contact-val"><a href="tel:0253-2230381">0253-2230381</a></span></div>
+                <div class="contact-row"><span class="contact-name">Focus Crops</span><span class="contact-val">Grapes, Onion, Wheat</span></div>
+                <div class="contact-row"><span class="contact-name">Training Days</span><span class="contact-val">Mon, Wed, Fri</span></div>
+            </div>
+        </div>
+
+        <!-- KVK - Aurangabad -->
+        <div class="dir-card" data-tags="kvk aurangabad krishi vigyan kendra marathwada cotton">
+            <div class="dir-card-header kvk-header"><i class="fa-solid fa-flask"></i> KVK Aurangabad (VNMKV)</div>
+            <div class="dir-card-body">
+                <div class="contact-row"><span class="contact-name">District</span><span class="contact-val">Aurangabad / Marathwada</span></div>
+                <div class="contact-row"><span class="contact-name">Phone</span><span class="contact-val"><a href="tel:02402371011">0240-2371011</a></span></div>
+                <div class="contact-row"><span class="contact-name">Focus Crops</span><span class="contact-val">Cotton, Soybean, Tur</span></div>
+                <div class="contact-row"><span class="contact-name">Training Days</span><span class="contact-val">Tue, Thu</span></div>
+            </div>
+        </div>
+
+        <!-- KVK - Nagpur -->
+        <div class="dir-card" data-tags="kvk nagpur vidarbha PDKV oranges citrus">
+            <div class="dir-card-header kvk-header"><i class="fa-solid fa-flask"></i> KVK Nagpur (PDKV)</div>
+            <div class="dir-card-body">
+                <div class="contact-row"><span class="contact-name">District</span><span class="contact-val">Nagpur / Vidarbha</span></div>
+                <div class="contact-row"><span class="contact-name">Phone</span><span class="contact-val"><a href="tel:07125680327">0712-5680327</a></span></div>
+                <div class="contact-row"><span class="contact-name">Focus Crops</span><span class="contact-val">Orange, Cotton, Soybean</span></div>
+                <div class="contact-row"><span class="contact-name">Training Days</span><span class="contact-val">Mon - Fri</span></div>
+            </div>
+        </div>
+
+        <!-- Soil Testing -->
+        <div class="dir-card" data-tags="soil testing health card lab pune nagpur nashik">
+            <div class="dir-card-header soil-header"><i class="fa-solid fa-vials"></i> Soil Testing Labs</div>
+            <div class="dir-card-body">
+                <div class="contact-row"><span class="contact-name">Pune Lab</span><span class="contact-val"><a href="tel:02026127680">020-2612-7680</a></span></div>
+                <div class="contact-row"><span class="contact-name">Nagpur Lab</span><span class="contact-val"><a href="tel:07122561600">0712-2561600</a></span></div>
+                <div class="contact-row"><span class="contact-name">Online Booking</span><span class="contact-val"><a href="https://soilhealth.dac.gov.in" target="_blank">soilhealth.dac.gov.in</a></span></div>
+                <div class="contact-row"><span class="contact-name">Cost</span><span class="contact-val">Free (Govt. Scheme)</span></div>
+            </div>
+        </div>
+
+        <!-- MahaFPC -->
+        <div class="dir-card" data-tags="fpc farmer producer company market mandi mahaagri">
+            <div class="dir-card-header market-header"><i class="fa-solid fa-store"></i> Market & APMC Helpdesk</div>
+            <div class="dir-card-body">
+                <div class="contact-row"><span class="contact-name">APMC Nashik (Onion)</span><span class="contact-val"><a href="tel:02532320222">0253-2320222</a></span></div>
+                <div class="contact-row"><span class="contact-name">APMC Latur (Tur)</span><span class="contact-val"><a href="tel:02382252081">02382-252081</a></span></div>
+                <div class="contact-row"><span class="contact-name">Mandi Bhav Portal</span><span class="contact-val"><a href="https://agmarknet.gov.in" target="_blank">agmarknet.gov.in</a></span></div>
+                <div class="contact-row"><span class="contact-name">MahaAgri Portal</span><span class="contact-val"><a href="https://mahaagri.gov.in" target="_blank">mahaagri.gov.in</a></span></div>
+            </div>
+        </div>
+
+        <!-- Insurance -->
+        <div class="dir-card" data-tags="insurance pmfby crop fasal bima yojana company">
+            <div class="dir-card-header insurance-header"><i class="fa-solid fa-shield-halved"></i> Crop Insurance (PMFBY)</div>
+            <div class="dir-card-body">
+                <div class="contact-row"><span class="contact-name">PMFBY Helpline</span><span class="contact-val"><a href="tel:18002007710">1800-200-7710</a></span></div>
+                <div class="contact-row"><span class="contact-name">Grievance Portal</span><span class="contact-val"><a href="https://pmfby.gov.in" target="_blank">pmfby.gov.in</a></span></div>
+                <div class="contact-row"><span class="contact-name">AIC of India</span><span class="contact-val"><a href="tel:01123389939">011-2338-9939</a></span></div>
+                <div class="contact-row"><span class="contact-name">Claim Window</span><span class="contact-val">72 hrs after crop loss</span></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.dir-page { max-width: 1100px; }
+.search-bar {
+    display: flex; align-items: center;
+    background: white; border: 1px solid var(--border);
+    border-radius: 10px; padding: 0.6rem 1rem;
+    gap: 0.8rem; margin: 1.2rem 0;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.search-bar i { color: #999; }
+.search-bar input { flex: 1; border: none; outline: none; font-size: 0.95rem; font-family: inherit; background: transparent; }
+.dir-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.2rem; }
+.dir-card { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; box-shadow: 0 3px 12px rgba(0,0,0,0.05); transition: 0.2s; }
+.dir-card:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+.dir-card-header { padding: 0.8rem 1rem; color: white; font-weight: 700; font-size: 0.85rem; display: flex; align-items: center; gap: 0.6rem; }
+.national-header { background: linear-gradient(135deg, #003366, #005599); }
+.state-header { background: linear-gradient(135deg, #138808, #1aaa0a); }
+.kvk-header { background: linear-gradient(135deg, #7d4200, #b35900); }
+.soil-header { background: linear-gradient(135deg, #5c3300, #8c5000); }
+.market-header { background: linear-gradient(135deg, #1a5580, #2277aa); }
+.insurance-header { background: linear-gradient(135deg, #6a0dad, #9b30d0); }
+.dir-card-body { padding: 0.8rem 1rem; }
+.contact-row { display: flex; justify-content: space-between; align-items: center; padding: 0.45rem 0; border-bottom: 1px solid #f5f5f5; font-size: 0.83rem; gap: 0.5rem; }
+.contact-row:last-child { border-bottom: none; }
+.contact-name { color: #555; font-weight: 500; }
+.contact-val { font-weight: 700; text-align: right; }
+.contact-val a { color: var(--gov-blue); text-decoration: none; }
+.contact-val a:hover { text-decoration: underline; }
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function filterDirectory() {
+    const query = document.getElementById('dirSearch').value.toLowerCase();
+    document.querySelectorAll('.dir-card').forEach(card => {
+        const tags = card.getAttribute('data-tags') || '';
+        const text = (card.textContent + ' ' + tags).toLowerCase();
+        card.style.display = text.includes(query) ? 'block' : 'none';
+    });
+}
+</script>
+{% endblock %}

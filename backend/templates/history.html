@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Consultation History | Maha-Advisory{% endblock %}
+
+{% block content %}
+<div class="history-page">
+    <div class="header-section">
+        <h2>Your Consultation Log</h2>
+        <p>Review your past AI expert consultations and advice reports.</p>
+    </div>
+
+    <div class="history-table-wrapper">
+        <table class="history-table">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Topic / Question</th>
+                    <th>Language</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>12 May 2024</td>
+                    <td>Ladki Bahin Yojana benefits and process</td>
+                    <td>English</td>
+                    <td><span class="status-badge">Completed</span></td>
+                    <td><a href="/" class="btn-open">View Report</a></td>
+                </tr>
+                <tr>
+                    <td>11 May 2024</td>
+                    <td>कापूस पिकावरील लाल्या रोग उपाय</td>
+                    <td>Marathi</td>
+                    <td><span class="status-badge">Completed</span></td>
+                    <td><a href="/" class="btn-open">View Report</a></td>
+                </tr>
+                <tr>
+                    <td>10 May 2024</td>
+                    <td>PM-Kisan installment status</td>
+                    <td>Hindi</td>
+                    <td><span class="status-badge">Completed</span></td>
+                    <td><a href="/" class="btn-open">View Report</a></td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.history-table-wrapper {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 2rem;
+    overflow: hidden;
+    box-shadow: var(--shadow);
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.history-table th {
+    background: var(--bg);
+    text-align: left;
+    padding: 1rem 1.5rem;
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: var(--text);
+    text-transform: uppercase;
+    border-bottom: 2px solid var(--border);
+}
+
+.history-table td {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    font-size: 0.95rem;
+    color: var(--text);
+}
+
+.status-badge {
+    background: rgba(40, 167, 69, 0.1);
+    color: var(--green);
+    padding: 0.3rem 0.8rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.btn-open {
+    color: var(--blue);
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.85rem;
+}
+
+.btn-open:hover { text-decoration: underline; }
+{% endblock %}

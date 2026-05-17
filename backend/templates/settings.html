@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+
+{% block title %}System Settings | Maha-Advisory{% endblock %}
+
+{% block content %}
+<div class="settings-page">
+    <div class="header-section">
+        <h2>App & Profile Settings</h2>
+        <p>Manage your account preferences and application configuration.</p>
+    </div>
+
+    <div class="settings-container">
+        <div class="settings-section">
+            <h3><i class="fa-solid fa-user-gear"></i> Profile Configuration</h3>
+            <div class="setting-item">
+                <div class="label">Farmer ID</div>
+                <div class="value">MH-401293</div>
+            </div>
+            <div class="setting-item">
+                <div class="label">Default Language</div>
+                <div class="value">Marathi</div>
+            </div>
+        </div>
+
+        <div class="settings-section">
+            <h3><i class="fa-solid fa-bell"></i> Notifications</h3>
+            <div class="setting-item">
+                <div class="label">WhatsApp Alerts</div>
+                <div class="value"><span class="toggle active">ON</span></div>
+            </div>
+            <div class="setting-item">
+                <div class="label">SMS Updates</div>
+                <div class="value"><span class="toggle">OFF</span></div>
+            </div>
+        </div>
+
+        <div class="settings-section" style="border: none;">
+            <h3><i class="fa-solid fa-shield-halved"></i> System Security</h3>
+            <p style="font-size: 0.9rem; color: var(--text-light); margin-top: 0.5rem;">All advisory data is encrypted and managed by official government security protocols.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.settings-container {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-top: 2rem;
+    padding: 2rem;
+}
+
+.settings-section {
+    padding-bottom: 2rem;
+    margin-bottom: 2rem;
+    border-bottom: 1px solid #eee;
+}
+
+.settings-section h3 {
+    color: var(--gov-blue);
+    font-size: 1.1rem;
+    margin-bottom: 1.5rem;
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+}
+
+.setting-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.8rem 0;
+}
+
+.setting-item .label { font-weight: 600; color: var(--text-dark); }
+.setting-item .value { color: var(--text-light); font-weight: 500; }
+
+.toggle {
+    padding: 0.3rem 1rem;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    background: #eee;
+    color: #666;
+}
+
+.toggle.active { background: var(--gov-green); color: white; }
+{% endblock %}

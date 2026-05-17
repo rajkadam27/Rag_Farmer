@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+{% block title %}Land Health Dashboard | Maha-Advisory{% endblock %}
+{% block content %}
+<div class="dash-container">
+    <div class="dash-header">
+        <div class="dash-title">
+            <h2><i class="fa-solid fa-map-location-dot" style="color:var(--gov-orange)"></i> Smart Land Health Dashboard</h2>
+            <p>Select field on map to get 7-day soil health trends and AI analysis.</p>
+        </div>
+        <div class="lang-pill-selector">
+            <button class="lang-pill active" onclick="setLang('Marathi', this)">मराठी</button>
+            <button class="lang-pill" onclick="setLang('Hindi', this)">हिंदी</button>
+            <button class="lang-pill" onclick="setLang('English', this)">English</button>
+        </div>
+    </div>
+
+    <div class="dash-grid">
+        <!-- LEFT: Map & Controls -->
+        <div class="dash-card">
+            <div class="card-header"><i class="fa-solid fa-location-crosshairs"></i> Select Field Location</div>
+            <div class="card-body scroll-y" style="padding: 0;">
+                <div id="farmMap" style="height: 320px; width: 100%;"></div>
+                <div style="padding: 1.2rem;">
+                    <div class="form-row">
+                        <div class="input-group">
+                            <label>Latitude</label>
+                            <input type="number" id="lhLat" placeholder="17.6799" step="0.0001" oninput="updateMarker()">
+                        </div>
+                        <div class="input-group">
+                            <label>Longitude</label>
+                            <input type="number" id="lhLon" placeholder="74.0088" step="0.0001" oninput="updateMarker()">
+                        </div>
+                    </div>
+                    <button class="btn-primary-dash" style="width: 100%; margin-top: 1rem;" onclick="analyzeField()">
+                        <i class="fa-solid fa-satellite"></i> Analyze Field Health
+                    </button>
+                    <div class="lhd-quick-places" style="margin-top: 1rem;">
+                        <small style="display: block; margin-bottom: 0.5rem; font-weight: 700; color: var(--muted);">Quick Select:</small>
+                        <button class="quick-pill" onclick="setLocation(19.9975, 73.7898, 'Nashik')">Nashik</button>
+                        <button class="quick-pill" onclick="setLocation(17.6799, 74.0088, 'Satara')">Satara</button>
+                        <button class="quick-pill" onclick="setLocation(21.1458, 79.0882, 'Nagpur')">Nagpur</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Results Dashboard -->
+        <div class="dash-card">
+            <div class="card-header"><i class="fa-solid fa-chart-line"></i> Soil Health & AI Report</div>
+            <div id="lhdResultArea" class="card-body scroll-y">
+                <div id="lhdLoader" style="display:none" class="dash-loader">
+                    <div class="pulse-ring"></div>
+                    <p>Fetching satellite soil data...</p>
+                </div>
+
+                <div id="lhdDashboard" style="display:none">
+                    <!-- Health Banner -->
+                    <div class="health-banner" id="healthBanner" style="background: linear-gradient(135deg, #004488, #0066cc);">
+                        <div class="ndvi-circle" id="ndviBadge">🟢</div>
+                        <div>
+                            <div style="font-weight: 800; font-size: 1.1rem;" id="fieldCondition">Soil Moisture: Adequate</div>
+                            <div style="font-size: 0.8rem; opacity: 0.9;">7-Day Historical Trend Analysis</div>
+                        </div>
+                    </div>
+
+                    <!-- Metrics Grid -->
+                    <div class="metrics-dashboard">
+                        <div class="m-card">
+                            <div class="m-label">Rainfall (7d)</div>
+                            <div class="m-val" id="lhRain">—</div>
+                            <div class="m-unit">mm</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Soil Moisture</div>
+                            <div class="m-val" id="lhMoisture">—</div>
+                            <div class="m-unit">Avg %</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Avg Max Temp</div>
+                            <div class="m-val" id="lhTemp">—</div>
+                            <div class="m-unit">°C</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Evaporation</div>
+                            <div class="m-val" id="lhEvapo">—</div>
+                            <div class="m-unit">ET0</div>
+                        </div>
+                    </div>
+
+                    <div class="markdown-content" id="lhdAiReport" style="margin-top: 1.5rem;"></div>
+                </div>
+
+                <div id="lhdEmpty" class="empty-dashboard">
+                    <i class="fa-solid fa-earth-asia"></i>
+                    <h3>Select Field on Map</h3>
+                    <p>AI will analyze historical soil moisture and climate trends for your specific coordinates.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+/* Dashboard Layout Core */
+.dash-container { height: calc(100vh - 120px); display: flex; flex-direction: column; gap: 1rem; overflow: hidden; padding: 1rem; }
+.dash-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; }
+.dash-title h2 { font-size: 1.3rem; color: var(--gov-blue); margin: 0; }
+.dash-title p { font-size: 0.8rem; color: #666; margin: 0; }
+
+.dash-grid { display: grid; grid-template-columns: 380px 1fr; gap: 1.2rem; flex: 1; overflow: hidden; }
+@media(max-width: 1100px) { .dash-grid { grid-template-columns: 1fr; overflow-y: auto; } .dash-container { height: auto; overflow-y: auto; } }
+
+.dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow); }
+.card-header { background: var(--bg); padding: 0.8rem 1.2rem; font-weight: 700; color: var(--text); font-size: 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; }
+.card-body { flex: 1; padding: 1.2rem; position: relative; }
+
+.scroll-y { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.scroll-y::-webkit-scrollbar { width: 6px; }
+.scroll-y::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
+
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.input-group { display: flex; flex-direction: column; gap: 0.35rem; }
+.input-group label { font-size: 0.75rem; font-weight: 700; color: var(--muted); }
+.input-group input { padding: 0.7rem; border: 1.5px solid var(--border); border-radius: 10px; font-family: inherit; font-size: 0.9rem; background: var(--bg); color: var(--text); }
+
+.btn-primary-dash { background: var(--blue); color: white; border: none; padding: 0.9rem; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.6rem; transition: 0.2s; }
+.btn-primary-dash:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,51,102,0.2); }
+
+.health-banner { color: white; padding: 1.2rem; border-radius: 15px; display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; }
+.ndvi-circle { width: 55px; height: 55px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; font-size: 1.5rem; }
+
+.metrics-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; }
+.m-card { background: var(--bg); border: 1px solid var(--border); padding: 1rem; border-radius: 12px; text-align: center; }
+.m-label { font-size: 0.7rem; color: var(--muted); font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem; }
+.m-val { font-size: 1.4rem; font-weight: 800; color: var(--blue); }
+.m-unit { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+
+.dash-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; gap: 1rem; color: var(--muted); }
+.pulse-ring { width: 50px; height: 50px; border: 4px solid var(--blue); border-radius: 50%; animation: pulse 1.2s infinite; }
+@keyframes pulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+.empty-dashboard { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; text-align: center; color: var(--border); gap: 1rem; }
+.empty-dashboard i { font-size: 3.5rem; }
+.empty-dashboard h3 { color: var(--muted); font-size: 1rem; }
+.empty-dashboard p { font-size: 0.85rem; color: var(--muted); max-width: 280px; }
+
+.lang-pill { background: var(--bg); border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-right: 0.3rem; margin-bottom: 0.3rem; color: var(--muted); transition: 0.3s; }
+.lang-pill:hover { background: var(--nav-active-bg); color: var(--blue); }
+
+.quick-pill { background: var(--bg); border: 1px solid var(--border); padding: 0.4rem 0.8rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer; margin-right: 0.3rem; margin-bottom: 0.3rem; color: var(--muted); transition: 0.3s; }
+.quick-pill:hover { background: var(--nav-active-bg); color: var(--blue); }
+
+.lang-pill-selector { display: flex; background: var(--bg); padding: 3px; border-radius: 30px; border: 1px solid var(--border); }
+.lang-pill-selector .lang-pill { margin-right: 0; margin-bottom: 0; border: none; }
+.lang-pill-selector .lang-pill.active { background: var(--blue); color: white; }
+
+.markdown-content { font-size: 0.95rem; line-height: 1.8; color: var(--text); }
+.markdown-content h1 { font-size: 1.4rem; color: var(--blue); margin-bottom: 1rem; }
+.markdown-content h2 { font-size: 1.1rem; margin-top: 1.5rem; border-left: 4px solid var(--orange); padding-left: 1rem; background: var(--bg); padding: 0.5rem 1rem; border-radius: 0 8px 8px 0; }
+.markdown-content li { margin-bottom: 0.8rem; padding: 0.8rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; list-style: none; }
+.markdown-content strong { color: var(--blue); }
+{% endblock %}
+
+{% block extra_js %}
+<!-- Leaflet.js - Free, No API Key -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+let map, marker;
+let currentLang = 'Marathi';
+
+function setLang(lang, el) {
+    currentLang = lang;
+    const parent = el.closest('.lang-pill-selector');
+    parent.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+}
+
+// Initialize map centered on Maharashtra
+window.addEventListener('load', function() {
+    map = L.map('farmMap').setView([19.7515, 75.7139], 7);
+    
+    // Satellite tile layer
+    const satellite = L.tileLayer(
+        'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}',
+        { attribution: 'Tiles © Esri', maxZoom: 19 }
+    );
+    
+    satellite.addTo(map);
+
+    // Click on map to set location
+    map.on('click', function(e) {
+        const { lat, lng } = e.latlng;
+        document.getElementById('lhLat').value = lat.toFixed(4);
+        document.getElementById('lhLon').value = lng.toFixed(4);
+        placeMarker(lat, lng);
+    });
+});
+
+function placeMarker(lat, lon) {
+    const icon = L.icon({
+        iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-green.png',
+        shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/0.7.7/images/marker-shadow.png',
+        iconSize: [25, 41], iconAnchor: [12, 41], popupAnchor: [1, -34]
+    });
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lon], {icon}).addTo(map);
+    map.setView([lat, lon], 13);
+}
+
+function updateMarker() {
+    const lat = parseFloat(document.getElementById('lhLat').value);
+    const lon = parseFloat(document.getElementById('lhLon').value);
+    if (lat && lon) placeMarker(lat, lon);
+}
+
+function setLocation(lat, lon, name) {
+    document.getElementById('lhLat').value = lat;
+    document.getElementById('lhLon').value = lon;
+    placeMarker(lat, lon);
+}
+
+async function analyzeField() {
+    const lat = document.getElementById('lhLat').value;
+    const lon = document.getElementById('lhLon').value;
+    if (!lat || !lon) { alert('Please select a location.'); return; }
+
+    document.getElementById('lhdLoader').style.display = 'flex';
+    document.getElementById('lhdDashboard').style.display = 'none';
+    document.getElementById('lhdEmpty').style.display = 'none';
+
+    try {
+        const resp = await fetch(`/api/land-health?lat=${lat}&lon=${lon}&lang=${currentLang}`);
+        const data = await resp.json();
+
+        if (data.error) throw new Error(data.error);
+
+        const s = data.summary;
+        document.getElementById('lhRain').innerText = s.total_rainfall_mm ?? '0';
+        document.getElementById('lhMoisture').innerText = s.avg_soil_moisture_pct ? `${s.avg_soil_moisture_pct}%` : '—';
+        document.getElementById('lhTemp').innerText = s.avg_max_temperature ? `${s.avg_max_temperature}°C` : '—';
+        document.getElementById('lhEvapo').innerText = s.daily_records[s.daily_records.length-1].evapotranspiration ?? '—';
+
+        const moisture = s.avg_soil_moisture_pct || 0;
+        const badge = document.getElementById('ndviBadge');
+        if (moisture >= 20) { badge.innerText = '🟢'; document.getElementById('fieldCondition').innerText = 'Soil Health: Good'; }
+        else if (moisture >= 10) { badge.innerText = '🟡'; document.getElementById('fieldCondition').innerText = 'Soil Health: Monitor'; }
+        else { badge.innerText = '🔴'; document.getElementById('fieldCondition').innerText = 'Soil Health: Critical'; }
+
+        document.getElementById('lhdAiReport').innerHTML = (typeof marked !== 'undefined') ? marked.parse(data.ai_report) : data.ai_report;
+        document.getElementById('lhdLoader').style.display = 'none';
+        document.getElementById('lhdDashboard').style.display = 'block';
+        document.getElementById('lhdResultArea').scrollTop = 0;
+
+    } catch(e) {
+        document.getElementById('lhdLoader').style.display = 'none';
+        document.getElementById('lhdEmpty').style.display = 'flex';
+        document.getElementById('lhdEmpty').innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
+    }
+}
+</script>
+{% endblock %}

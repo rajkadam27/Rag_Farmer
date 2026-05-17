@@ -1,0 +1,239 @@
+{% extends "base.html" %}
+
+{% block title %}Welfare Schemes | Maha-Advisory{% endblock %}
+
+{% block content %}
+<div class="schemes-dashboard">
+    <div class="dash-header">
+        <div class="title-area">
+            <h2><i class="fa-solid fa-scroll" style="color: var(--gov-orange)"></i> Kalyanakari Yojana Portal</h2>
+            <p>Explore official Government of Maharashtra and Central welfare schemes with ease.</p>
+        </div>
+        <div class="stats-pills">
+            <div class="stat-pill"><span class="val">12</span> <span class="lbl">Active Schemes</span></div>
+            <div class="stat-pill"><span class="val">4</span> <span class="lbl">Categories</span></div>
+        </div>
+    </div>
+
+    <!-- Search & Filter Bar -->
+    <div class="filter-bar">
+        <div class="search-box">
+            <i class="fa-solid fa-magnifying-glass"></i>
+            <input type="text" id="schemeSearch" placeholder="Search by scheme name or keywords..." onkeyup="filterSchemes()">
+        </div>
+        <div class="filter-group">
+            <button class="filter-btn active" onclick="setCategory('all', this)">All</button>
+            <button class="filter-btn" onclick="setCategory('agriculture', this)">Agriculture</button>
+            <button class="filter-btn" onclick="setCategory('women', this)">Women Welfare</button>
+            <button class="filter-btn" onclick="setCategory('finance', this)">Finance/Loans</button>
+            <button class="filter-btn" onclick="setCategory('insurance', this)">Insurance</button>
+        </div>
+    </div>
+
+    <div class="schemes-grid" id="schemesGrid">
+        <!-- Agriculture -->
+        <div class="scheme-card" data-category="agriculture">
+            <div class="card-accent" style="background: var(--gov-green);"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="scheme-icon" style="background: #e1f5fe;"><i class="fa-solid fa-wheat-awn" style="color: #0288d1;"></i></div>
+                    <div class="tag">Central Scheme</div>
+                </div>
+                <h3>PM-Kisan Samman Nidhi</h3>
+                <p>Direct income support of ₹6,000 per year provided to all landholding farmer families across the country.</p>
+                <div class="scheme-metrics">
+                    <div class="metric"><i class="fa-solid fa-indian-rupee-sign"></i> ₹6,000/yr</div>
+                    <div class="metric"><i class="fa-solid fa-clock"></i> Ongoing</div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/scheme-checker" class="btn-action">Check Eligibility <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <!-- Women -->
+        <div class="scheme-card" data-category="women">
+            <div class="card-accent" style="background: #e91e63;"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="scheme-icon" style="background: #fce4ec;"><i class="fa-solid fa-person-breastfeeding" style="color: #d81b60;"></i></div>
+                    <div class="tag">Maharashtra Govt</div>
+                </div>
+                <h3>Majhi Ladki Bahin Yojana</h3>
+                <p>Empowering women with ₹1,500 monthly financial aid to ensure dignity and self-reliance for sisters in MH.</p>
+                <div class="scheme-metrics">
+                    <div class="metric"><i class="fa-solid fa-indian-rupee-sign"></i> ₹18,000/yr</div>
+                    <div class="metric"><i class="fa-solid fa-clock"></i> New 2024</div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/scheme-checker" class="btn-action">Check Eligibility <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <!-- Insurance -->
+        <div class="scheme-card" data-category="insurance">
+            <div class="card-accent" style="background: #00bcd4;"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="scheme-icon" style="background: #e0f7fa;"><i class="fa-solid fa-cloud-sun-rain" style="color: #0097a7;"></i></div>
+                    <div class="tag">Risk Cover</div>
+                </div>
+                <h3>Crop Insurance (PMFBY)</h3>
+                <p>Protects farmers against yield loss due to natural calamities, pests, and diseases at very low premium.</p>
+                <div class="scheme-metrics">
+                    <div class="metric"><i class="fa-solid fa-shield-halved"></i> 100% Cover</div>
+                    <div class="metric"><i class="fa-solid fa-clock"></i> Seasonal</div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/scheme-checker" class="btn-action">Apply Now <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <!-- Finance -->
+        <div class="scheme-card" data-category="finance">
+            <div class="card-accent" style="background: var(--gov-blue);"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="scheme-icon" style="background: #e8eaf6;"><i class="fa-solid fa-building-columns" style="color: #3f51b5;"></i></div>
+                    <div class="tag">KCC</div>
+                </div>
+                <h3>Kisan Credit Card (KCC)</h3>
+                <p>Easy access to short-term credit for cultivation, post-harvest expenses, and farm maintenance at low interest.</p>
+                <div class="scheme-metrics">
+                    <div class="metric"><i class="fa-solid fa-percent"></i> 4% Interest</div>
+                    <div class="metric"><i class="fa-solid fa-clock"></i> On-demand</div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/scheme-checker" class="btn-action">Check Eligibility <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <!-- Agriculture -->
+        <div class="scheme-card" data-category="agriculture">
+            <div class="card-accent" style="background: var(--gov-orange);"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="scheme-icon" style="background: #fff3e0;"><i class="fa-solid fa-droplet" style="color: #fb8c00;"></i></div>
+                    <div class="tag">Irrigation</div>
+                </div>
+                <h3>PM Krishi Sinchayee Yojana</h3>
+                <p>Har Khet Ko Pani - focused on creating sources of assured irrigation and improving water use efficiency.</p>
+                <div class="scheme-metrics">
+                    <div class="metric"><i class="fa-solid fa-faucet-drip"></i> 55% Subsidy</div>
+                    <div class="metric"><i class="fa-solid fa-clock"></i> Central</div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/scheme-checker" class="btn-action">Check Eligibility <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </div>
+
+        <!-- Agriculture -->
+        <div class="scheme-card" data-category="agriculture">
+            <div class="card-accent" style="background: #4caf50;"></div>
+            <div class="card-body">
+                <div class="card-top">
+                    <div class="scheme-icon" style="background: #e8f5e9;"><i class="fa-solid fa-tractor" style="color: #2e7d32;"></i></div>
+                    <div class="tag">Subsidy</div>
+                </div>
+                <h3>Maha-DBT Farm Mechanization</h3>
+                <p>Grant for purchasing farm equipment like tractors, tillers, and harvesters for Maharashtra farmers.</p>
+                <div class="scheme-metrics">
+                    <div class="metric"><i class="fa-solid fa-hand-holding-dollar"></i> Up to 50%</div>
+                    <div class="metric"><i class="fa-solid fa-clock"></i> Yearly</div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <a href="/scheme-checker" class="btn-action">Check Eligibility <i class="fa-solid fa-chevron-right"></i></a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.schemes-dashboard { padding: 1rem; }
+
+.dash-header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 2rem; border-bottom: 1px solid var(--border); padding-bottom: 1.5rem; }
+.title-area h2 { font-size: 1.6rem; color: var(--gov-blue); font-weight: 800; margin-bottom: 0.4rem; }
+.title-area p { color: var(--text-muted); font-size: 0.9rem; }
+
+.stats-pills { display: flex; gap: 1rem; }
+.stat-pill { background: var(--card-bg); border: 1px solid var(--border); padding: 0.6rem 1rem; border-radius: 12px; display: flex; flex-direction: column; align-items: center; min-width: 100px; }
+.stat-pill .val { font-size: 1.2rem; font-weight: 800; color: var(--gov-blue); }
+.stat-pill .lbl { font-size: 0.65rem; font-weight: 700; color: var(--text-muted); text-transform: uppercase; }
+
+.filter-bar { display: flex; gap: 1.5rem; margin-bottom: 2rem; align-items: center; background: var(--card-bg); padding: 0.8rem 1.2rem; border-radius: 15px; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.search-box { flex: 1; position: relative; }
+.search-box i { position: absolute; left: 1rem; top: 50%; transform: translateY(-50%); color: var(--text-muted); }
+.search-box input { width: 100%; padding: 0.7rem 1rem 0.7rem 2.8rem; border-radius: 10px; border: 1px solid var(--border); background: var(--bg); color: var(--text-main); font-family: inherit; font-size: 0.9rem; }
+
+.filter-group { display: flex; gap: 0.5rem; }
+.filter-btn { border: none; background: transparent; padding: 0.5rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; color: var(--text-muted); cursor: pointer; transition: 0.3s; }
+.filter-btn:hover { background: rgba(0,51,102,0.05); color: var(--gov-blue); }
+.filter-btn.active { background: var(--gov-blue); color: white; }
+
+.schemes-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
+
+.scheme-card { background: var(--card-bg); border: 1px solid var(--border); border-radius: 18px; overflow: hidden; display: flex; flex-direction: column; transition: 0.3s; position: relative; box-shadow: var(--shadow); }
+.scheme-card:hover { transform: translateY(-8px); box-shadow: 0 12px 30px rgba(0,0,0,0.1); border-color: var(--gov-blue); }
+
+.card-accent { height: 6px; width: 100%; }
+.card-body { padding: 1.5rem; flex: 1; }
+
+.card-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.2rem; }
+.scheme-icon { width: 50px; height: 50px; border-radius: 14px; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; }
+.tag { background: rgba(0,0,0,0.05); padding: 0.3rem 0.8rem; border-radius: 20px; font-size: 0.7rem; font-weight: 700; color: var(--text-muted); }
+
+.scheme-card h3 { font-size: 1.15rem; color: var(--text-main); font-weight: 800; margin-bottom: 0.8rem; }
+.scheme-card p { font-size: 0.88rem; color: var(--text-muted); line-height: 1.6; margin-bottom: 1.5rem; height: 3.2rem; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+
+.scheme-metrics { display: flex; gap: 1rem; border-top: 1px solid var(--border); padding-top: 1rem; }
+.metric { font-size: 0.75rem; font-weight: 700; color: var(--gov-green); display: flex; align-items: center; gap: 0.4rem; }
+
+.card-footer { padding: 1.2rem 1.5rem; background: rgba(0,0,0,0.02); border-top: 1px solid var(--border); }
+.btn-action { text-decoration: none; display: flex; align-items: center; justify-content: center; gap: 0.6rem; font-weight: 800; color: var(--gov-blue); font-size: 0.88rem; transition: 0.2s; }
+.btn-action:hover { gap: 1rem; color: var(--gov-orange); }
+
+[data-theme="dark"] .stat-pill, 
+[data-theme="dark"] .filter-bar,
+[data-theme="dark"] .scheme-card { background: #1e293b; }
+[data-theme="dark"] .btn-action { color: #60a5fa; }
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentCategory = 'all';
+
+function setCategory(cat, el) {
+    currentCategory = cat;
+    document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+    el.classList.add('active');
+    filterSchemes();
+}
+
+function filterSchemes() {
+    const query = document.getElementById('schemeSearch').value.toLowerCase();
+    const cards = document.querySelectorAll('.scheme-card');
+    
+    cards.forEach(card => {
+        const title = card.querySelector('h3').innerText.toLowerCase();
+        const desc = card.querySelector('p').innerText.toLowerCase();
+        const cat = card.getAttribute('data-category');
+        
+        const matchesSearch = title.includes(query) || desc.includes(query);
+        const matchesCat = currentCategory === 'all' || cat === currentCategory;
+        
+        if(matchesSearch && matchesCat) {
+            card.style.display = 'flex';
+        } else {
+            card.style.display = 'none';
+        }
+    });
+}
+</script>
+{% endblock %}
+

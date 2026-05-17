@@ -1,0 +1,182 @@
+{% extends "base.html" %}
+{% block title %}Sowing Calendar | Maha-Advisory{% endblock %}
+
+{% block content %}
+<div class="cal-page">
+    <div class="header-section">
+        <h2><i class="fa-solid fa-calendar-days" style="color:var(--gov-orange)"></i> Sowing Calendar — Maharashtra</h2>
+        <p>Month-wise guide for optimal sowing, planting, and harvesting of major crops in Maharashtra.</p>
+    </div>
+
+    <div class="season-tabs">
+        <button class="stab active" onclick="showSeason('kharif')"><i class="fa-solid fa-cloud-rain"></i> Kharif (खरीप)</button>
+        <button class="stab" onclick="showSeason('rabi')"><i class="fa-solid fa-snowflake"></i> Rabi (रब्बी)</button>
+        <button class="stab" onclick="showSeason('summer')"><i class="fa-solid fa-sun"></i> Summer (उन्हाळी)</button>
+    </div>
+
+    <!-- Kharif -->
+    <div id="kharif" class="season-content">
+        <div class="season-notice kharif-notice">
+            <i class="fa-solid fa-info-circle"></i>
+            <strong>Kharif Season (June - November):</strong> Main sowing starts after pre-monsoon showers. Ensure soil has adequate moisture before sowing.
+        </div>
+        <div class="crop-cal-grid">
+            <div class="crop-cal-card">
+                <div class="crop-cal-header" style="background:#1a6b1a"><i class="fa-solid fa-leaf"></i> Cotton (BT कापूस)</div>
+                <div class="crop-cal-body">
+                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val kharif-chip">June 1st - July 15</span></div>
+                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">October - February</span></div>
+                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">BG-II, NHH-44</span></div>
+                    <div class="cal-row"><span class="cal-label">Districts</span><span class="cal-val">Vidarbha, Marathwada</span></div>
+                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Apply Urea at 30 DAS for early boll formation.</div>
+                </div>
+            </div>
+            <div class="crop-cal-card">
+                <div class="crop-cal-header" style="background:#005580"><i class="fa-solid fa-circle"></i> Soybean (सोयाबीन)</div>
+                <div class="crop-cal-body">
+                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val kharif-chip">June 15 - July 15</span></div>
+                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">October - November</span></div>
+                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">JS-335, MAUS-71</span></div>
+                    <div class="cal-row"><span class="cal-label">Districts</span><span class="cal-val">All Maharashtra</span></div>
+                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Seed treatment with Rhizobium culture improves yield by 15%.</div>
+                </div>
+            </div>
+            <div class="crop-cal-card">
+                <div class="crop-cal-header" style="background:#7d4200"><i class="fa-solid fa-droplet"></i> Rice (भात)</div>
+                <div class="crop-cal-body">
+                    <div class="cal-row"><span class="cal-label">Nursery</span><span class="cal-val kharif-chip">June 1 - June 20</span></div>
+                    <div class="cal-row"><span class="cal-label">Transplanting</span><span class="cal-val">July 1 - August 15</span></div>
+                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">Indrayani, PKV Sona</span></div>
+                    <div class="cal-row"><span class="cal-label">Districts</span><span class="cal-val">Konkan, Nashik</span></div>
+                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Maintain 5cm water level during tillering stage.</div>
+                </div>
+            </div>
+            <div class="crop-cal-card">
+                <div class="crop-cal-header" style="background:#5c3d00"><i class="fa-solid fa-pepper-hot"></i> Tur / Pigeon Pea (तूर)</div>
+                <div class="crop-cal-body">
+                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val kharif-chip">June 15 - July 15</span></div>
+                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">January - February</span></div>
+                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">ICPL-87, BDN-2</span></div>
+                    <div class="cal-row"><span class="cal-label">Districts</span><span class="cal-val">Latur, Solapur</span></div>
+                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Use weed control at 20-25 DAS for maximum grain yield.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Rabi -->
+    <div id="rabi" class="season-content" style="display:none">
+        <div class="season-notice rabi-notice">
+            <i class="fa-solid fa-info-circle"></i>
+            <strong>Rabi Season (October - March):</strong> Sown after monsoon. Primarily depends on residual soil moisture or irrigation.
+        </div>
+        <div class="crop-cal-grid">
+            <div class="crop-cal-card">
+                <div class="crop-cal-header" style="background:#4a1080"><i class="fa-solid fa-wheat-awn"></i> Wheat (गहू)</div>
+                <div class="crop-cal-body">
+                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val rabi-chip">Nov 1 - Dec 15</span></div>
+                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">March - April</span></div>
+                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">NW-1014, K-307</span></div>
+                    <div class="cal-row"><span class="cal-label">Irrigation</span><span class="cal-val">4-5 irrigations needed</span></div>
+                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> First irrigation (Crown Root Initiation) is most critical at 21 DAS.</div>
+                </div>
+            </div>
+            <div class="crop-cal-card">
+                <div class="crop-cal-header" style="background:#8b0000"><i class="fa-solid fa-circle"></i> Onion (कांदा)</div>
+                <div class="crop-cal-body">
+                    <div class="cal-row"><span class="cal-label">Nursery</span><span class="cal-val rabi-chip">Sept 15 - Oct 15</span></div>
+                    <div class="cal-row"><span class="cal-label">Transplanting</span><span class="cal-val">Nov - Dec</span></div>
+                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">February - March</span></div>
+                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">N-2-4-1, Bhima Raj</span></div>
+                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Stop irrigation 15 days before harvest to improve storage life.</div>
+                </div>
+            </div>
+            <div class="crop-cal-card">
+                <div class="crop-cal-header" style="background:#006644"><i class="fa-solid fa-seedling"></i> Gram / Chickpea (हरभरा)</div>
+                <div class="crop-cal-body">
+                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val rabi-chip">Oct 15 - Nov 15</span></div>
+                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">February - March</span></div>
+                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">Vishal, PKV-2</span></div>
+                    <div class="cal-row"><span class="cal-label">District</span><span class="cal-val">Marathwada, Vidarbha</span></div>
+                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Single irrigation at pre-flowering is highly beneficial.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Summer -->
+    <div id="summer" class="season-content" style="display:none">
+        <div class="season-notice summer-notice">
+            <i class="fa-solid fa-info-circle"></i>
+            <strong>Summer Season (February - May):</strong> Irrigation-dependent crops. Requires careful water management.
+        </div>
+        <div class="crop-cal-grid">
+            <div class="crop-cal-card">
+                <div class="crop-cal-header" style="background:#b35900"><i class="fa-solid fa-pepper-hot"></i> Groundnut (भुईमूग)</div>
+                <div class="crop-cal-body">
+                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val summer-chip">Jan 15 - Feb 28</span></div>
+                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">May - June</span></div>
+                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">JL-24, Phule Pragati</span></div>
+                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Gypsum application at 200 kg/acre helps pod filling.</div>
+                </div>
+            </div>
+            <div class="crop-cal-card">
+                <div class="crop-cal-header" style="background:#1e6b00"><i class="fa-solid fa-circle"></i> Sunflower (सूर्यफूल)</div>
+                <div class="crop-cal-body">
+                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val summer-chip">Jan 15 - Mar 1</span></div>
+                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">May</span></div>
+                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">MSFH-17, CO-1</span></div>
+                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Hand pollination during morning hours increases seed set.</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.cal-page { max-width: 1100px; }
+.season-tabs { display: flex; gap: 0.8rem; margin: 1.5rem 0 1rem; flex-wrap: wrap; }
+.stab {
+    padding: 0.6rem 1.2rem; background: var(--surface);
+    border: 1px solid var(--border); border-radius: 8px;
+    cursor: pointer; font-weight: 600; font-size: 0.88rem;
+    color: var(--muted); display: flex; align-items: center; gap: 0.5rem;
+    transition: 0.2s; font-family: inherit;
+}
+.stab.active, .stab:hover { background: var(--blue); color: white; border-color: var(--blue); }
+.season-notice {
+    padding: 0.8rem 1rem; border-radius: 8px;
+    font-size: 0.88rem; margin-bottom: 1.2rem;
+    display: flex; align-items: flex-start; gap: 0.7rem;
+}
+.kharif-notice { background: rgba(26, 107, 26, 0.1); border: 1px solid rgba(26, 107, 26, 0.3); color: #2ea043; }
+.rabi-notice { background: rgba(74, 16, 128, 0.1); border: 1px solid rgba(74, 16, 128, 0.3); color: #d2a8ff; }
+.summer-notice { background: rgba(179, 89, 0, 0.1); border: 1px solid rgba(179, 89, 0, 0.3); color: #ffa657; }
+.crop-cal-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.2rem;
+}
+.crop-cal-card { background: var(--surface); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); }
+.crop-cal-header { padding: 0.8rem 1rem; color: white; font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; gap: 0.6rem; }
+.crop-cal-body { padding: 1rem; }
+.cal-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.4rem 0; border-bottom: 1px dashed var(--border); font-size: 0.83rem; gap: 0.5rem; }
+.cal-label { color: var(--muted); font-weight: 500; flex-shrink: 0; }
+.cal-val { text-align: right; font-weight: 600; color: var(--text); }
+.kharif-chip { color: #2ea043; background: rgba(26, 107, 26, 0.1); padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid rgba(26, 107, 26, 0.3); }
+.rabi-chip { color: #d2a8ff; background: rgba(74, 16, 128, 0.1); padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid rgba(74, 16, 128, 0.3); }
+.summer-chip { color: #ffa657; background: rgba(179, 89, 0, 0.1); padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid rgba(179, 89, 0, 0.3); }
+.cal-tip { margin-top: 0.8rem; background: var(--bg); border-left: 3px solid var(--orange); padding: 0.5rem 0.7rem; font-size: 0.8rem; color: var(--text); line-height: 1.5; border-radius: 0 4px 4px 0; }
+{% endblock %}
+
+{% block extra_js %}
+<script>
+function showSeason(s) {
+    document.querySelectorAll('.season-content').forEach(el => el.style.display = 'none');
+    document.querySelectorAll('.stab').forEach(el => el.classList.remove('active'));
+    document.getElementById(s).style.display = 'block';
+    event.target.closest('.stab').classList.add('active');
+}
+</script>
+{% endblock %}

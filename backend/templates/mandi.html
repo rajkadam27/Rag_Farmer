@@ -1,0 +1,219 @@
+{% extends "base.html" %}
+{% block title %}Live Mandi Prices | Maha-Advisory{% endblock %}
+{% block content %}
+<div class="dash-container">
+    <div class="dash-header">
+        <div class="dash-title">
+            <h2><i class="fa-solid fa-chart-line" style="color:var(--gov-orange)"></i> Live Mandi Intelligence</h2>
+            <p>Fetch real-time Agmarknet prices and get AI sell/hold advice.</p>
+        </div>
+        <div class="lang-pill-selector">
+            <button class="lang-pill active" onclick="setLang('Marathi', this)">मराठी</button>
+            <button class="lang-pill" onclick="setLang('Hindi', this)">हिंदी</button>
+            <button class="lang-pill" onclick="setLang('English', this)">English</button>
+        </div>
+    </div>
+
+    <div class="dash-grid">
+        <!-- LEFT: Market Filters -->
+        <div class="dash-card">
+            <div class="card-header"><i class="fa-solid fa-filter"></i> Select Market & Crop</div>
+            <div class="card-body">
+                <form id="mandiForm" class="dash-form">
+                    <div class="input-group">
+                        <label>Commodity (Crop)</label>
+                        <select id="commodity">
+                            <option value="Soybean">Soybean (सोयाबीन)</option>
+                            <option value="Cotton">Cotton (कापूस)</option>
+                            <option value="Onion">Onion (कांदा)</option>
+                            <option value="Wheat">Wheat (गहू)</option>
+                            <option value="Tur">Tur (तूर)</option>
+                            <option value="Maize">Maize (मका)</option>
+                            <option value="Gram">Gram (हरभरा)</option>
+                        </select>
+                    </div>
+                    <div class="input-group" style="margin-top: 1rem;">
+                        <label>State</label>
+                        <select id="state">
+                            <option value="Maharashtra">Maharashtra</option>
+                            <option value="Madhya Pradesh">Madhya Pradesh</option>
+                            <option value="Gujarat">Gujarat</option>
+                            <option value="Karnataka">Karnataka</option>
+                        </select>
+                    </div>
+                    <button type="button" class="btn-primary-dash" style="width:100%; margin-top:1.5rem;"
+                        onclick="fetchMandi()">
+                        Fetch Live Prices <i class="fa-solid fa-sync"></i>
+                    </button>
+                </form>
+                <div class="market-status" style="margin-top:2rem;">
+                    <div class="info-badge">
+                        <i class="fa-solid fa-circle-check"></i> AGMARKNET Verified
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Mandi Dashboard -->
+        <div class="dash-card">
+            <div class="card-header"><i class="fa-solid fa-receipt"></i> Market Analysis Report</div>
+            <div id="mandiResultArea" class="card-body scroll-y">
+                <div id="mandiLoader" style="display:none" class="dash-loader">
+                    <div class="pulse-ring"></div>
+                    <p>Fetching real-time price data...</p>
+                </div>
+
+                <div id="mandiResult" style="display:none">
+                    <!-- Price Banner -->
+                    <div class="health-banner" style="background: linear-gradient(135deg, #138808, #28a745);">
+                        <div class="ndvi-circle" id="mMainIcon" style="font-size: 1.8rem;">💰</div>
+                        <div>
+                            <div style="font-weight: 800; font-size: 1.3rem;" id="mCropName">Soybean Prices</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;" id="mStateName">Maharashtra Markets</div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Metrics Grid -->
+                    <div class="metrics-dashboard">
+                        <div class="m-card">
+                            <div class="m-label">Avg Modal Price</div>
+                            <div class="m-val" id="mModal">—</div>
+                            <div class="m-unit">₹/Quintal</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Highest Price</div>
+                            <div class="m-val" id="mMax">—</div>
+                            <div class="m-unit">₹/Quintal</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Lowest Price</div>
+                            <div class="m-val" id="mMin">—</div>
+                            <div class="m-unit">₹/Quintal</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Market Trend</div>
+                            <div class="m-val" id="mTrend">Stable</div>
+                            <div class="m-unit">AI Analysis</div>
+                        </div>
+                    </div>
+
+                    <div class="markdown-content" id="mAiReport" style="margin-top: 1.5rem;"></div>
+                </div>
+
+                <div id="mandiEmpty" class="empty-dashboard">
+                    <i class="fa-solid fa-shop"></i>
+                    <h3>Market Intelligence Ready</h3>
+                    <p>Select a crop to see today's highest, lowest, and modal prices with AI sell/hold advice.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.dash-container { height: calc(100vh - var(--topbar-h, 64px) - 2rem); display: flex; flex-direction: column; gap: 1rem; overflow: hidden; }
+.dash-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.75rem; border-bottom: 1px solid var(--border); margin-bottom: 0.5rem; }
+.dash-header .dash-title h2 { font-size: 1.3rem; font-weight: 800; color: var(--text); }
+.dash-header .dash-title p { font-size: 0.85rem; color: var(--muted); margin-top: 0.2rem; }
+.dash-grid { display: grid; grid-template-columns: 360px 1fr; gap: 1.2rem; flex: 1; overflow: hidden; }
+.dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow); }
+.card-header { background: var(--bg); padding: 0.8rem 1.2rem; font-weight: 700; color: var(--text); font-size: 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; }
+.card-body { flex: 1; padding: 1.5rem; position: relative; overflow: hidden; }
+.scroll-y { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.scroll-y::-webkit-scrollbar { width: 6px; }
+.scroll-y::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
+
+.input-group label { font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 0.4rem; display: block; }
+.input-group select { width: 100%; padding: 0.75rem; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 0.9rem; }
+.input-group select:focus { outline: none; border-color: var(--blue); }
+
+.btn-primary-dash { background: linear-gradient(135deg, #16a34a, #15803d); color: white; border: none; padding: 1rem; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.7rem; transition: 0.2s; width: 100%; margin-top: 1.5rem; font-family: inherit; font-size: 0.95rem; }
+.btn-primary-dash:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(22,163,74,0.35); }
+
+.health-banner { color: white; padding: 1.2rem; border-radius: 15px; display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; }
+.ndvi-circle { width: 55px; height: 55px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; font-size: 1.5rem; }
+
+.metrics-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 1rem; }
+.m-card { background: var(--bg); border: 1px solid var(--border); padding: 1rem; border-radius: 12px; text-align: center; }
+.m-label { font-size: 0.65rem; color: var(--muted); font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 0.4rem; }
+.m-val { font-size: 1.4rem; font-weight: 800; color: var(--blue); }
+.m-unit { font-size: 0.68rem; color: var(--muted); font-weight: 600; }
+
+.dash-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; gap: 1rem; color: var(--muted); }
+.pulse-ring { width: 50px; height: 50px; border: 4px solid var(--green); border-radius: 50%; animation: spin-pulse 1.2s infinite; }
+@keyframes spin-pulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+.empty-dashboard { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; color: var(--border); gap: 1rem; text-align: center; }
+.empty-dashboard i { font-size: 4rem; }
+.empty-dashboard h3 { color: var(--muted); font-size: 1rem; }
+.empty-dashboard p { font-size: 0.85rem; color: var(--muted); max-width: 280px; }
+
+.markdown-content { font-size: 0.92rem; line-height: 1.85; color: var(--text); }
+.markdown-content h1 { font-size: 1.3rem; color: var(--blue); margin-bottom: 1rem; }
+.markdown-content h2 { font-size: 1rem; margin-top: 1.4rem; border-left: 4px solid var(--orange); padding: 0.5rem 1rem; background: var(--bg); border-radius: 0 8px 8px 0; }
+.markdown-content li { margin-bottom: 0.7rem; padding: 0.75rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; list-style: none; }
+.markdown-content strong { color: var(--blue); }
+.info-badge { background: #dcfce7; color: #166534; padding: 0.6rem 1rem; border-radius: 8px; font-size: 0.8rem; font-weight: 700; display: flex; align-items: center; gap: 0.6rem; margin-top: 1rem; }
+[data-theme="dark"] .info-badge { background: #052e16; color: #86efac; }
+
+.lang-pill-selector { display: flex; background: var(--bg); padding: 3px; border-radius: 30px; border: 1px solid var(--border); }
+.lang-pill { border: none; background: none; padding: 0.4rem 1rem; border-radius: 25px; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.8rem; transition: 0.3s; color: var(--muted); }
+.lang-pill.active { background: var(--blue); color: white; }
+{% endblock %}
+
+{% block extra_js %}
+<script>
+    let currentLang = 'Marathi';
+
+    function setLang(lang, el) {
+        currentLang = lang;
+        document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
+        el.classList.add('active');
+    }
+
+    async function fetchMandi() {
+        const commodity = document.getElementById('commodity').value;
+        const state = document.getElementById('state').value;
+
+        document.getElementById('mandiLoader').style.display = 'flex';
+        document.getElementById('mandiResult').style.display = 'none';
+        document.getElementById('mandiEmpty').style.display = 'none';
+
+        try {
+            const resp = await fetch(`/api/mandi?commodity=${commodity}&state=${state}&lang=${currentLang}`);
+            const data = await resp.json();
+
+            document.getElementById('mandiLoader').style.display = 'none';
+            document.getElementById('mandiResult').style.display = 'block';
+
+            // Update Banner
+            document.getElementById('mCropName').innerText = `${commodity} Prices`;
+            document.getElementById('mStateName').innerText = `${state} Market Summary`;
+
+            // Update Metrics from real data
+            if (data.prices && data.prices.length > 0) {
+                const p = data.prices[0];
+                document.getElementById('mModal').innerText = p.modal_price || '—';
+                document.getElementById('mMax').innerText = p.max_price || '—';
+                document.getElementById('mMin').innerText = p.min_price || '—';
+                document.getElementById('mTrend').innerText = data.advice && data.advice.includes('Hold') ? 'Hold' : 'Sell';
+            }
+
+            // Update AI Advice
+            const adviceEl = document.getElementById('mAiReport');
+            if (typeof marked !== 'undefined') {
+                adviceEl.innerHTML = data.advice ? marked.parse(data.advice) : 'Price data unavailable.';
+            } else {
+                adviceEl.innerText = data.advice;
+            }
+            document.getElementById('mandiResultArea').scrollTop = 0;
+
+        } catch (e) {
+            document.getElementById('mandiLoader').style.display = 'none';
+            document.getElementById('mandiEmpty').style.display = 'flex';
+            document.getElementById('mandiEmpty').innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
+        }
+    }
+</script>
+{% endblock %}

@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+
+{% block title %}Crop Protection | Maha-Advisory{% endblock %}
+
+{% block content %}
+<div class="agronomy-page">
+    <div class="header-section">
+        <h2>Crop Protection & Agronomy</h2>
+        <p>Expert guidance on pest control, soil health, and best practices for Maharashtra's major crops.</p>
+    </div>
+
+    <div class="crop-grid">
+        <div class="crop-card">
+            <img src="https://img.freepik.com/premium-photo/cotton-flower-cotton-field-with-sky-background_106030-221.jpg" alt="Cotton">
+            <div class="crop-info">
+                <h3>Cotton (कापूस)</h3>
+                <p>Management of Bollworm, Lalya disease, and BT Cotton techniques.</p>
+                <a href="/" class="btn-view">Consult AI</a>
+            </div>
+        </div>
+
+        <div class="crop-card">
+            <img src="https://images.unsplash.com/photo-1595113316349-9fa4eb24f884?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Soybean">
+            <div class="crop-info">
+                <h3>Soybean (सोयाबीन)</h3>
+                <p>Seed treatment, weed management, and yellow mosaic control.</p>
+                <a href="/" class="btn-view">Consult AI</a>
+            </div>
+        </div>
+
+        <div class="crop-card">
+            <img src="https://images.unsplash.com/photo-1590779033100-9f60705a2f3b?ixlib=rb-1.2.1&auto=format&fit=crop&w=800&q=80" alt="Onion">
+            <div class="crop-info">
+                <h3>Onion (कांदा)</h3>
+                <p>Nursery management, storage techniques, and fungal disease prevention.</p>
+                <a href="/" class="btn-view">Consult AI</a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.crop-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2.5rem;
+    margin-top: 2rem;
+}
+
+.crop-card {
+    background: white;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: 0.3s;
+}
+
+.crop-card:hover { transform: scale(1.02); box-shadow: 0 15px 30px rgba(0,0,0,0.1); }
+
+.crop-card img { width: 100%; height: 180px; object-fit: cover; }
+
+.crop-info { padding: 1.5rem; }
+.crop-info h3 { color: var(--gov-blue); font-size: 1.2rem; margin-bottom: 0.5rem; }
+.crop-info p { font-size: 0.9rem; color: var(--text-light); margin-bottom: 1.5rem; line-height: 1.5; }
+
+.btn-view {
+    display: block;
+    text-align: center;
+    background: var(--gov-green);
+    color: white;
+    padding: 0.7rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: 700;
+    font-size: 0.9rem;
+}
+
+.btn-view:hover { background: #0e6606; }
+{% endblock %}

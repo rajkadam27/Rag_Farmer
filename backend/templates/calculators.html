@@ -1,0 +1,229 @@
+{% extends "base.html" %}
+{% block title %}Agri Calculators | Maha-Advisory{% endblock %}
+
+{% block content %}
+<div class="calc-page">
+    <div class="header-section">
+        <h2><i class="fa-solid fa-calculator" style="color:var(--gov-orange)"></i> Agricultural Calculators</h2>
+        <p>Free tools to help you plan your farm activities accurately and efficiently.</p>
+    </div>
+
+    <div class="calc-grid">
+
+        <!-- Fertilizer Calculator -->
+        <div class="calc-card">
+            <div class="calc-header fert-header">
+                <i class="fa-solid fa-flask"></i> Fertilizer Calculator (NPK)
+            </div>
+            <div class="calc-body">
+                <div class="form-group">
+                    <label>Field Area (in Acres)</label>
+                    <input type="number" id="fertArea" placeholder="e.g. 2.5" min="0.1" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Crop Type</label>
+                    <select id="fertCrop">
+                        <option value="cotton">Cotton (कापूस)</option>
+                        <option value="soybean">Soybean (सोयाबीन)</option>
+                        <option value="wheat">Wheat (गहू)</option>
+                        <option value="onion">Onion (कांदा)</option>
+                        <option value="sugarcane">Sugarcane (ऊस)</option>
+                    </select>
+                </div>
+                <button class="calc-btn" onclick="calcFertilizer()">Calculate</button>
+                <div id="fertResult" class="result-area" style="display:none"></div>
+            </div>
+        </div>
+
+        <!-- Seed Rate Calculator -->
+        <div class="calc-card">
+            <div class="calc-header seed-header">
+                <i class="fa-solid fa-seedling"></i> Seed Rate Calculator
+            </div>
+            <div class="calc-body">
+                <div class="form-group">
+                    <label>Field Area (in Acres)</label>
+                    <input type="number" id="seedArea" placeholder="e.g. 3" min="0.1" step="0.1">
+                </div>
+                <div class="form-group">
+                    <label>Crop Type</label>
+                    <select id="seedCrop">
+                        <option value="cotton">Cotton (कापूस) - BT</option>
+                        <option value="soybean">Soybean (सोयाबीन)</option>
+                        <option value="wheat">Wheat (गहू)</option>
+                        <option value="onion">Onion (कांदा)</option>
+                        <option value="sugarcane">Sugarcane (ऊस)</option>
+                    </select>
+                </div>
+                <button class="calc-btn" onclick="calcSeed()">Calculate</button>
+                <div id="seedResult" class="result-area" style="display:none"></div>
+            </div>
+        </div>
+
+        <!-- KCC Loan Interest Calculator -->
+        <div class="calc-card">
+            <div class="calc-header loan-header">
+                <i class="fa-solid fa-indian-rupee-sign"></i> KCC Loan Interest Calculator
+            </div>
+            <div class="calc-body">
+                <div class="form-group">
+                    <label>Loan Amount (in Rs.)</label>
+                    <input type="number" id="loanAmt" placeholder="e.g. 100000" min="1000">
+                </div>
+                <div class="form-group">
+                    <label>Duration (in Months)</label>
+                    <input type="number" id="loanMonths" placeholder="e.g. 12" min="1" max="60">
+                </div>
+                <div class="form-group">
+                    <label>Annual Interest Rate (%)</label>
+                    <input type="number" id="loanRate" value="4" min="1" max="20" step="0.1">
+                    <small style="color:#888">KCC Subsidized Rate: 4% | Market Rate: 7-9%</small>
+                </div>
+                <button class="calc-btn" onclick="calcLoan()">Calculate</button>
+                <div id="loanResult" class="result-area" style="display:none"></div>
+            </div>
+        </div>
+
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.calc-page { max-width: 1100px; }
+.calc-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+}
+.calc-card {
+    background: var(--surface);
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    overflow: hidden;
+}
+.calc-header {
+    padding: 1rem 1.2rem;
+    color: white;
+    font-weight: 700;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.7rem;
+}
+.fert-header { background: linear-gradient(135deg, #1a6b1a, #2d9e2d); }
+.seed-header { background: linear-gradient(135deg, #005580, #0077b6); }
+.loan-header { background: linear-gradient(135deg, #7d4200, #c07000); }
+.calc-body { padding: 1.2rem; }
+.form-group { margin-bottom: 1rem; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-bottom: 0.4rem; }
+.form-group input, .form-group select {
+    width: 100%; padding: 0.6rem 0.8rem;
+    border: 1px solid var(--border); border-radius: 8px;
+    font-size: 0.9rem; font-family: inherit;
+    transition: border-color 0.2s;
+    background: var(--bg); color: var(--text);
+}
+.form-group input:focus, .form-group select:focus {
+    border-color: var(--blue); outline: none;
+    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
+}
+.form-group small { display: block; margin-top: 0.3rem; font-size: 0.75rem; color: var(--muted); }
+.calc-btn {
+    width: 100%; padding: 0.75rem;
+    background: var(--blue); color: white;
+    border: none; border-radius: 8px;
+    font-size: 0.95rem; font-weight: 700;
+    cursor: pointer; transition: 0.2s;
+    font-family: inherit;
+}
+.calc-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.result-area {
+    margin-top: 1rem;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 1rem;
+    font-size: 0.88rem;
+    line-height: 1.7;
+    color: var(--text);
+}
+.result-row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px dashed var(--border); }
+.result-row:last-child { border-bottom: none; font-weight: 700; color: var(--blue); }
+{% endblock %}
+
+{% block extra_js %}
+<script>
+// Fertilizer data (kg per acre)
+const fertData = {
+    cotton:    { N: 50, P: 25, K: 25, urea: 109, dap: 54, mop: 42 },
+    soybean:   { N: 20, P: 40, K: 20, urea: 43, dap: 87, mop: 33 },
+    wheat:     { N: 60, P: 30, K: 30, urea: 130, dap: 65, mop: 50 },
+    onion:     { N: 50, P: 50, K: 50, urea: 109, dap: 109, mop: 83 },
+    sugarcane: { N: 125, P: 60, K: 60, urea: 272, dap: 130, mop: 100 }
+};
+
+// Seed data (kg per acre)
+const seedData = {
+    cotton:    { rate: 0.75, unit: 'packets (450g each)', price: 850 },
+    soybean:   { rate: 30,   unit: 'kg', price: 70 },
+    wheat:     { rate: 40,   unit: 'kg', price: 35 },
+    onion:     { rate: 3,    unit: 'kg', price: 600 },
+    sugarcane: { rate: 5500, unit: 'cuttings (setts)', price: 0.5 }
+};
+
+function calcFertilizer() {
+    const area = parseFloat(document.getElementById('fertArea').value);
+    const crop = document.getElementById('fertCrop').value;
+    const res = document.getElementById('fertResult');
+    if (!area || area <= 0) { alert('Please enter a valid area.'); return; }
+    const d = fertData[crop];
+    res.style.display = 'block';
+    res.innerHTML = `
+        <strong>Fertilizer Requirement for ${area} Acres of ${crop.charAt(0).toUpperCase()+crop.slice(1)}:</strong>
+        <div class="result-row"><span>Urea (46% N)</span><span>${(d.urea * area).toFixed(1)} kg</span></div>
+        <div class="result-row"><span>DAP (18-46-0)</span><span>${(d.dap * area).toFixed(1)} kg</span></div>
+        <div class="result-row"><span>MOP / Potash</span><span>${(d.mop * area).toFixed(1)} kg</span></div>
+        <div class="result-row"><span>Est. Cost (approx.)</span><span>Rs. ${Math.round((d.urea*area*6) + (d.dap*area*28) + (d.mop*area*17)).toLocaleString()}</span></div>
+    `;
+}
+
+function calcSeed() {
+    const area = parseFloat(document.getElementById('seedArea').value);
+    const crop = document.getElementById('seedCrop').value;
+    const res = document.getElementById('seedResult');
+    if (!area || area <= 0) { alert('Please enter a valid area.'); return; }
+    const d = seedData[crop];
+    const total = (d.rate * area);
+    const cost = Math.round(total * d.price);
+    res.style.display = 'block';
+    res.innerHTML = `
+        <strong>Seed Requirement for ${area} Acres of ${crop.charAt(0).toUpperCase()+crop.slice(1)}:</strong>
+        <div class="result-row"><span>Total Seed Required</span><span>${total % 1 === 0 ? total : total.toFixed(2)} ${d.unit}</span></div>
+        <div class="result-row"><span>Estimated Cost</span><span>Rs. ${cost.toLocaleString()}</span></div>
+        <div class="result-row"><span>Tip</span><span>Always buy certified seeds from govt. approved dealers.</span></div>
+    `;
+}
+
+function calcLoan() {
+    const P = parseFloat(document.getElementById('loanAmt').value);
+    const months = parseInt(document.getElementById('loanMonths').value);
+    const rate = parseFloat(document.getElementById('loanRate').value);
+    const res = document.getElementById('loanResult');
+    if (!P || !months || !rate) { alert('Please fill all fields.'); return; }
+    const r = rate / 100 / 12;
+    const interest = P * r * months;
+    const total = P + interest;
+    res.style.display = 'block';
+    res.innerHTML = `
+        <strong>KCC Loan Calculation:</strong>
+        <div class="result-row"><span>Principal Amount</span><span>Rs. ${P.toLocaleString()}</span></div>
+        <div class="result-row"><span>Duration</span><span>${months} months</span></div>
+        <div class="result-row"><span>Interest Rate</span><span>${rate}% per annum</span></div>
+        <div class="result-row"><span>Total Interest</span><span>Rs. ${Math.round(interest).toLocaleString()}</span></div>
+        <div class="result-row"><span>Total Repayment</span><span>Rs. ${Math.round(total).toLocaleString()}</span></div>
+    `;
+}
+</script>
+{% endblock %}

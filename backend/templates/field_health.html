@@ -1,0 +1,199 @@
+{% extends "base.html" %}
+{% block title %}Field Health Monitor | Maha-Advisory{% endblock %}
+{% block content %}
+<div class="dash-container">
+    <div class="dash-header">
+        <div class="dash-title">
+            <h2><i class="fa-solid fa-satellite-dish" style="color:var(--gov-orange)"></i> Field Health Monitor</h2>
+            <p>Real-time satellite climate analysis for your specific field coordinates.</p>
+        </div>
+        <div class="lang-pill-selector">
+            <button class="lang-pill active" onclick="setLang('Marathi', this)">मराठी</button>
+            <button class="lang-pill" onclick="setLang('Hindi', this)">हिंदी</button>
+            <button class="lang-pill" onclick="setLang('English', this)">English</button>
+        </div>
+    </div>
+
+    <div class="dash-grid">
+        <!-- LEFT: Coordinate Input -->
+        <div class="dash-card">
+            <div class="card-header"><i class="fa-solid fa-location-dot"></i> Enter Coordinates</div>
+            <div class="card-body">
+                <div class="form-row">
+                    <div class="input-group">
+                        <label>Latitude</label>
+                        <input type="number" id="fhLat" placeholder="e.g. 17.6799" step="0.0001">
+                    </div>
+                    <div class="input-group">
+                        <label>Longitude</label>
+                        <input type="number" id="fhLon" placeholder="e.g. 74.0088" step="0.0001">
+                    </div>
+                </div>
+                <button class="btn-primary-dash" style="width:100%; margin-top:1.5rem;" onclick="fetchFieldHealth()">
+                    Analyze Field Health <i class="fa-solid fa-satellite"></i>
+                </button>
+                
+                <div class="coord-helper" style="margin-top:2rem; background:var(--nav-active-bg); border:1px solid var(--blue); padding:1rem; border-radius:12px; font-size:0.8rem; color:var(--blue);">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <strong>Tip:</strong> Long press on Google Maps to get coordinates. Example: 17.6799, 74.0088.
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT: Health Dashboard -->
+        <div class="dash-card">
+            <div class="card-header"><i class="fa-solid fa-chart-line"></i> Satellite Health Report</div>
+            <div id="fhResultArea" class="card-body scroll-y">
+                <div id="fhLoader" style="display:none" class="dash-loader">
+                    <div class="pulse-ring"></div>
+                    <p>Connecting to satellite data network...</p>
+                </div>
+
+                <div id="fhContent" style="display:none">
+                    <!-- Banner -->
+                    <div class="health-banner" style="background: linear-gradient(135deg, #138808, #28a745);">
+                        <div class="ndvi-circle" style="font-size: 1.8rem;">🛰️</div>
+                        <div>
+                            <div style="font-weight: 800; font-size: 1.3rem;">Field Status: Active</div>
+                            <div style="font-size: 0.9rem; opacity: 0.9;" id="fhSubtitle">Satellite Climate Summary</div>
+                        </div>
+                    </div>
+
+                    <!-- 4 Metrics Grid -->
+                    <div class="metrics-dashboard">
+                        <div class="m-card">
+                            <div class="m-label">Max Temperature</div>
+                            <div class="m-val" id="fhMaxTemp">—</div>
+                            <div class="m-unit">°C</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Rainfall</div>
+                            <div class="m-val" id="fhRain">—</div>
+                            <div class="m-unit">mm</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Soil Moisture</div>
+                            <div class="m-val" id="fhMoisture">—</div>
+                            <div class="m-unit">% Avg</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Evapotranspiration</div>
+                            <div class="m-val" id="fhEvapo">1.2</div>
+                            <div class="m-unit">ET0</div>
+                        </div>
+                    </div>
+
+                    <div class="markdown-content" id="fhAiReport" style="margin-top: 1.5rem;"></div>
+                </div>
+
+                <div id="fhEmpty" class="empty-dashboard">
+                    <i class="fa-solid fa-earth-asia"></i>
+                    <h3>Field Health Ready</h3>
+                    <p>Enter coordinates to see a detailed AI analysis of your soil and climate data.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block extra_css %}
+.dash-container { height: calc(100vh - 120px); display: flex; flex-direction: column; gap: 1rem; overflow: hidden; }
+.dash-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; }
+.dash-grid { display: grid; grid-template-columns: 380px 1fr; gap: 1.2rem; flex: 1; overflow: hidden; }
+.dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: 20px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow); }
+.card-header { background: var(--bg); padding: 0.8rem 1.2rem; font-weight: 700; color: var(--text); font-size: 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; }
+.card-body { flex: 1; padding: 1.5rem; position: relative; }
+.scroll-y { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.scroll-y::-webkit-scrollbar { width: 6px; }
+.scroll-y::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
+
+.input-group label { font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 0.4rem; display: block; }
+.input-group input { width: 100%; padding: 0.8rem; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+
+.coord-helper { margin-top:2rem; background:var(--nav-active-bg); border:1px solid var(--blue); padding:1rem; border-radius:12px; font-size:0.8rem; color:var(--blue); }
+
+.btn-primary-dash { background: linear-gradient(135deg, var(--gov-blue), #0055bb); color: white; border: none; padding: 1rem; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.7rem; transition: 0.2s; }
+.btn-primary-dash:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,51,102,0.25); }
+
+.health-banner { color: white; padding: 1.2rem; border-radius: 15px; display: flex; align-items: center; gap: 1.2rem; margin-bottom: 1.5rem; }
+.ndvi-circle { width: 55px; height: 55px; background: rgba(255,255,255,0.2); border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px solid white; }
+
+.metrics-dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 1rem; }
+.m-card { background: var(--bg); border: 1px solid var(--border); padding: 1rem; border-radius: 12px; text-align: center; }
+.m-label { font-size: 0.7rem; color: var(--muted); font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem; }
+.m-val { font-size: 1.4rem; font-weight: 800; color: var(--blue); }
+.m-unit { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+
+.dash-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; gap: 1.5rem; color: var(--muted); }
+.pulse-ring { width: 50px; height: 50px; border: 4px solid var(--blue); border-radius: 50%; animation: pulse 1.2s infinite; }
+@keyframes pulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+.empty-dashboard { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; color: var(--border); gap: 1rem; text-align: center; }
+.empty-dashboard i { font-size: 4rem; }
+.empty-dashboard h3 { color: var(--muted); font-size: 1rem; }
+.empty-dashboard p { font-size: 0.85rem; color: var(--muted); max-width: 280px; }
+
+.markdown-content { font-size: 0.95rem; line-height: 1.8; color: var(--text); }
+.markdown-content h1 { font-size: 1.4rem; color: var(--blue); margin-bottom: 1rem; }
+.markdown-content h2 { font-size: 1.1rem; margin-top: 1.5rem; border-left: 4px solid var(--orange); padding-left: 1rem; background: var(--bg); padding: 0.5rem 1rem; border-radius: 0 8px 8px 0; }
+.markdown-content li { margin-bottom: 0.8rem; padding: 0.8rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; list-style: none; }
+.markdown-content strong { color: var(--blue); }
+
+.lang-pill-selector { display: flex; background: var(--bg); padding: 3px; border-radius: 30px; border: 1px solid var(--border); }
+.lang-pill { border: none; background: none; padding: 0.4rem 1.2rem; border-radius: 25px; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.8rem; transition: 0.3s; color: var(--muted); }
+.lang-pill.active { background: var(--blue); color: white; }
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentLang = 'Marathi';
+
+function setLang(lang, el) {
+    currentLang = lang;
+    document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+}
+
+async function fetchFieldHealth() {
+    const lat = document.getElementById('fhLat').value;
+    const lon = document.getElementById('fhLon').value;
+    if (!lat || !lon) { alert('Please enter both latitude and longitude.'); return; }
+
+    document.getElementById('fhLoader').style.display = 'flex';
+    document.getElementById('fhContent').style.display = 'none';
+    document.getElementById('fhEmpty').style.display = 'none';
+
+    try {
+        const resp = await fetch(`/api/field-health?lat=${lat}&lon=${lon}&lang=${currentLang}`);
+        const data = await resp.json();
+
+        if (data.error) throw new Error(data.error);
+
+        const fd = data.field_data;
+        document.getElementById('fhMaxTemp').innerText = fd.max_temp ?? '—';
+        document.getElementById('fhRain').innerText = fd.rainfall_mm ?? '—';
+        document.getElementById('fhMoisture').innerText = fd.soil_moisture ? `${fd.soil_moisture}%` : '—';
+        document.getElementById('fhEvapo').innerText = fd.evapotranspiration ?? '1.2';
+        
+        document.getElementById('fhSubtitle').innerText = `Analysis for Lat: ${lat}, Lon: ${lon}`;
+
+        if (typeof marked !== 'undefined') {
+            document.getElementById('fhAiReport').innerHTML = marked.parse(data.ai_report || '');
+        } else {
+            document.getElementById('fhAiReport').innerText = data.ai_report || '';
+        }
+
+        document.getElementById('fhLoader').style.display = 'none';
+        document.getElementById('fhContent').style.display = 'block';
+        document.getElementById('fhResultArea').scrollTop = 0;
+
+    } catch(e) {
+        document.getElementById('fhLoader').style.display = 'none';
+        document.getElementById('fhEmpty').style.display = 'flex';
+        document.getElementById('fhEmpty').innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
+    }
+}
+</script>
+{% endblock %}
