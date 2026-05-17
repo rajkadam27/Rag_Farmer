@@ -62,8 +62,8 @@ async def get_mandi(commodity: str = "Soybean", state: str = "Maharashtra", lang
 
 @router.post("/pdf-summarize")
 async def summarize_pdf(file: UploadFile = File(...), language: str = Form("Marathi")):
-    """Upload a PDF (scheme document) and get an AI summary in the specified language."""
-    from utils.pdf_tool import summarize_pdf
+    """Upload a PDF (scheme document) and get an AI summary & text context in the specified language."""
+    from utils.pdf_tool import summarize_pdf, extract_pdf_text
 
     if not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
@@ -74,16 +74,53 @@ async def summarize_pdf(file: UploadFile = File(...), language: str = Form("Mara
             shutil.copyfileobj(file.file, buffer)
 
         summary = summarize_pdf(temp_path, language)
-        return {"summary": summary}
+        context = extract_pdf_text(temp_path)
+        return {"summary": summary, "context": context}
 
     except Exception as e:
-        return {"summary": f"PDF processing error: {str(e)}"}
+        return {"summary": f"PDF processing error: {str(e)}", "context": ""}
     finally:
         if os.path.exists(temp_path):
             try:
                 os.remove(temp_path)
             except Exception:
                 pass
+
+
+@router.post("/pdf-chat")
+async def chat_with_pdf(data: dict):
+    """Ask follow-up questions about the PDF using the provided context."""
+    from utils.llm import get_gemini_response
+    question = data.get("question")
+    context = data.get("context", "")
+    language = data.get("language", "Marathi")
+    
+    if not question:
+        raise HTTPException(status_code=400, detail="Question cannot be empty.")
+        
+    lang_map = {
+        "Marathi": "Marathi (मराठी)",
+        "Hindi": "Hindi (हिंदी)",
+        "English": "English"
+    }
+    mapped_lang = lang_map.get(language, "English")
+    
+    prompt = f"""You are a helpful government scheme advisor and precision agriculture consultant for Maharashtra, India.
+    RESPOND ENTIRELY IN THIS LANGUAGE: {mapped_lang}
+    
+    Here is the text context extracted from the PDF document uploaded by the farmer:
+    ---
+    {context}
+    ---
+    
+    The farmer is asking the following question about this document:
+    "{question}"
+    
+    Please answer the farmer's question accurately, clearly, and simply based on the document context. If the answer is not specified in the document, tell them politely that the document doesn't mention it, and offer a helpful expert suggestion related to their question. Keep it concise.
+    """
+    response = get_gemini_response(prompt)
+    return {"response": response}
+
 
 
 # ─── 5. FIELD HEALTH - Soil & Climate via Open-Meteo (no auth needed) ─────────

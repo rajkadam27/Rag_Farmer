@@ -4,8 +4,8 @@
 <div class="dash-container">
     <div class="dash-header">
         <div class="dash-title">
-            <h2><i class="fa-solid fa-map-location-dot" style="color:var(--gov-orange)"></i> Smart Land Health Dashboard</h2>
-            <p>Select field on map to get 7-day soil health trends and AI analysis.</p>
+            <h2><i class="fa-solid fa-satellite" style="color:var(--gov-orange)"></i> Multispectral Satellite Analytics</h2>
+            <p>Simulated NDVI crop vigor, spectral reflectance, soil trends, and AI precision zoning.</p>
         </div>
         <div class="lang-pill-selector">
             <button class="lang-pill active" onclick="setLang('Marathi', this)">मराठी</button>
@@ -19,7 +19,18 @@
         <div class="dash-card">
             <div class="card-header"><i class="fa-solid fa-location-crosshairs"></i> Select Field Location</div>
             <div class="card-body scroll-y" style="padding: 0;">
-                <div id="farmMap" style="height: 320px; width: 100%;"></div>
+                <div class="map-shell">
+                    <div id="farmMap" style="height: 320px; width: 100%;"></div>
+                    <div id="ndviMapStatus" class="ndvi-map-status">NDVI overlay standby</div>
+                    <div class="ndvi-map-legend">
+                        <div class="legend-title">NDVI Zones</div>
+                        <div class="legend-row"><span style="background:#0b5d1e"></span> Dense</div>
+                        <div class="legend-row"><span style="background:#2f9e44"></span> Healthy</div>
+                        <div class="legend-row"><span style="background:#f2c94c"></span> Early stress</div>
+                        <div class="legend-row"><span style="background:#f97316"></span> Stressed</div>
+                        <div class="legend-row"><span style="background:#dc2626"></span> Critical</div>
+                    </div>
+                </div>
                 <div style="padding: 1.2rem;">
                     <div class="form-row">
                         <div class="input-group">
@@ -32,7 +43,7 @@
                         </div>
                     </div>
                     <button class="btn-primary-dash" style="width: 100%; margin-top: 1rem;" onclick="analyzeField()">
-                        <i class="fa-solid fa-satellite"></i> Analyze Field Health
+                        <i class="fa-solid fa-satellite"></i> Analyze NDVI Field Health
                     </button>
                     <div class="lhd-quick-places" style="margin-top: 1rem;">
                         <small style="display: block; margin-bottom: 0.5rem; font-weight: 700; color: var(--muted);">Quick Select:</small>
@@ -46,7 +57,7 @@
 
         <!-- RIGHT: Results Dashboard -->
         <div class="dash-card">
-            <div class="card-header"><i class="fa-solid fa-chart-line"></i> Soil Health & AI Report</div>
+            <div class="card-header"><i class="fa-solid fa-chart-line"></i> NDVI Analytics & AI Report</div>
             <div id="lhdResultArea" class="card-body scroll-y">
                 <div id="lhdLoader" style="display:none" class="dash-loader">
                     <div class="pulse-ring"></div>
@@ -66,6 +77,16 @@
                     <!-- Metrics Grid -->
                     <div class="metrics-dashboard">
                         <div class="m-card">
+                            <div class="m-label">NDVI Score</div>
+                            <div class="m-val" id="lhNdvi">--</div>
+                            <div class="m-unit">0.00 - 1.00</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Crop Vigor</div>
+                            <div class="m-val" id="lhVigor" style="font-size:1.05rem">--</div>
+                            <div class="m-unit">Vegetation Class</div>
+                        </div>
+                        <div class="m-card">
                             <div class="m-label">Rainfall (7d)</div>
                             <div class="m-val" id="lhRain">—</div>
                             <div class="m-unit">mm</div>
@@ -84,6 +105,44 @@
                             <div class="m-label">Evaporation</div>
                             <div class="m-val" id="lhEvapo">—</div>
                             <div class="m-unit">ET0</div>
+                        </div>
+                        <div class="m-card">
+                            <div class="m-label">Stress Patch</div>
+                            <div class="m-val" id="lhStress" style="font-size:1.05rem">--</div>
+                            <div class="m-unit">Lowest Zone</div>
+                        </div>
+                    </div>
+
+                    <div class="ndvi-panels">
+                        <div class="spectral-panel">
+                            <div class="panel-head">
+                                <div>
+                                    <h3>Spectral Reflectance</h3>
+                                    <p>Red absorption vs near-infrared crop response</p>
+                                </div>
+                                <div class="spectral-score">
+                                    <span id="nirVal">--</span>
+                                    <small>NIR</small>
+                                </div>
+                            </div>
+                            <div class="chart-wrap">
+                                <canvas id="spectralChart"></canvas>
+                                <div id="chartTooltip" class="chart-tooltip"></div>
+                            </div>
+                            <div class="chart-legend">
+                                <span><i style="background:#ef4444"></i> Red band</span>
+                                <span><i style="background:#22c55e"></i> NIR band</span>
+                            </div>
+                        </div>
+
+                        <div class="zone-panel">
+                            <div class="panel-head compact">
+                                <div>
+                                    <h3>Precision Zones</h3>
+                                    <p>Simulated field patch diagnosis</p>
+                                </div>
+                            </div>
+                            <div id="zoneGrid" class="zone-grid"></div>
                         </div>
                     </div>
 
@@ -115,6 +174,41 @@
 .card-header { background: var(--bg); padding: 0.8rem 1.2rem; font-weight: 700; color: var(--text); font-size: 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; }
 .card-body { flex: 1; padding: 1.2rem; position: relative; }
 
+.map-shell { position: relative; overflow: hidden; border-bottom: 1px solid var(--border); }
+.ndvi-map-status {
+    position: absolute;
+    left: 0.8rem;
+    top: 0.8rem;
+    z-index: 500;
+    background: rgba(15, 23, 42, 0.78);
+    color: white;
+    border: 1px solid rgba(255,255,255,0.22);
+    border-radius: 9px;
+    padding: 0.45rem 0.65rem;
+    font-size: 0.72rem;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    backdrop-filter: blur(8px);
+}
+.ndvi-map-legend {
+    position: absolute;
+    right: 0.8rem;
+    bottom: 0.8rem;
+    z-index: 500;
+    width: 145px;
+    background: rgba(255,255,255,0.9);
+    border: 1px solid rgba(15,23,42,0.14);
+    border-radius: 10px;
+    padding: 0.65rem;
+    box-shadow: 0 10px 25px rgba(15,23,42,0.22);
+    backdrop-filter: blur(8px);
+}
+[data-theme="dark"] .ndvi-map-legend { background: rgba(22,27,34,0.9); }
+.legend-title { color: var(--text); font-size: 0.7rem; font-weight: 900; margin-bottom: 0.35rem; text-transform: uppercase; }
+.legend-row { display: flex; align-items: center; gap: 0.4rem; color: var(--text); font-size: 0.68rem; font-weight: 700; margin-top: 0.28rem; }
+.legend-row span { width: 18px; height: 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,0.12); }
+.ndvi-zone-tooltip { font-family: 'Outfit', sans-serif; font-weight: 800; }
+
 .scroll-y { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
 .scroll-y::-webkit-scrollbar { width: 6px; }
 .scroll-y::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
@@ -135,6 +229,74 @@
 .m-label { font-size: 0.7rem; color: var(--muted); font-weight: 700; text-transform: uppercase; margin-bottom: 0.4rem; }
 .m-val { font-size: 1.4rem; font-weight: 800; color: var(--blue); }
 .m-unit { font-size: 0.7rem; color: var(--muted); font-weight: 600; }
+
+.ndvi-panels {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(260px, 0.85fr);
+    gap: 1rem;
+    margin-top: 1.2rem;
+}
+.spectral-panel,
+.zone-panel {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 1rem;
+    min-width: 0;
+}
+.panel-head { display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem; margin-bottom: 0.8rem; }
+.panel-head.compact { margin-bottom: 0.6rem; }
+.panel-head h3 { font-size: 0.95rem; color: var(--text); margin: 0; }
+.panel-head p { font-size: 0.72rem; color: var(--muted); margin-top: 0.15rem; }
+.spectral-score {
+    min-width: 64px;
+    text-align: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.45rem 0.55rem;
+}
+.spectral-score span { display: block; color: #16a34a; font-size: 1rem; font-weight: 900; }
+.spectral-score small { color: var(--muted); font-size: 0.62rem; font-weight: 800; }
+.chart-wrap {
+    position: relative;
+    height: 230px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    overflow: hidden;
+}
+#spectralChart { display: block; width: 100%; height: 100%; }
+.chart-tooltip {
+    position: absolute;
+    display: none;
+    pointer-events: none;
+    background: rgba(15, 23, 42, 0.9);
+    color: white;
+    border-radius: 8px;
+    padding: 0.45rem 0.55rem;
+    font-size: 0.68rem;
+    line-height: 1.45;
+    z-index: 2;
+}
+.chart-legend { display: flex; gap: 1rem; align-items: center; flex-wrap: wrap; margin-top: 0.7rem; color: var(--muted); font-size: 0.72rem; font-weight: 800; }
+.chart-legend span { display: inline-flex; align-items: center; gap: 0.35rem; }
+.chart-legend i { width: 18px; height: 3px; border-radius: 999px; display: inline-block; }
+.zone-grid { display: grid; grid-template-columns: 1fr; gap: 0.55rem; max-height: 295px; overflow-y: auto; padding-right: 0.25rem; }
+.zone-card {
+    display: grid;
+    grid-template-columns: 8px 1fr auto;
+    gap: 0.65rem;
+    align-items: center;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 0.65rem;
+}
+.zone-strip { height: 100%; min-height: 42px; border-radius: 999px; }
+.zone-name { color: var(--text); font-size: 0.78rem; font-weight: 900; }
+.zone-status { color: var(--muted); font-size: 0.68rem; font-weight: 700; margin-top: 0.1rem; }
+.zone-score { color: var(--blue); font-size: 0.95rem; font-weight: 900; text-align: right; }
 
 .dash-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; gap: 1rem; color: var(--muted); }
 .pulse-ring { width: 50px; height: 50px; border: 4px solid var(--blue); border-radius: 50%; animation: pulse 1.2s infinite; }
@@ -160,6 +322,17 @@
 .markdown-content h2 { font-size: 1.1rem; margin-top: 1.5rem; border-left: 4px solid var(--orange); padding-left: 1rem; background: var(--bg); padding: 0.5rem 1rem; border-radius: 0 8px 8px 0; }
 .markdown-content li { margin-bottom: 0.8rem; padding: 0.8rem; background: var(--bg); border: 1px solid var(--border); border-radius: 10px; list-style: none; }
 .markdown-content strong { color: var(--blue); }
+
+@media(max-width: 900px) {
+    .ndvi-panels { grid-template-columns: 1fr; }
+    .zone-grid { max-height: none; }
+}
+
+@media(max-width: 520px) {
+    .ndvi-map-legend { position: static; width: auto; border-radius: 0; box-shadow: none; }
+    .ndvi-map-status { left: 0.55rem; top: 0.55rem; }
+    .chart-wrap { height: 210px; }
+}
 {% endblock %}
 
 {% block extra_js %}
@@ -167,8 +340,9 @@
 <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script>
-let map, marker;
+let map, marker, ndviLayerGroup, fieldBoundary;
 let currentLang = 'Marathi';
+let spectralPoints = [];
 
 function setLang(lang, el) {
     currentLang = lang;
@@ -207,6 +381,7 @@ function placeMarker(lat, lon) {
     if (marker) map.removeLayer(marker);
     marker = L.marker([lat, lon], {icon}).addTo(map);
     map.setView([lat, lon], 13);
+    clearNdviOverlay();
 }
 
 function updateMarker() {
@@ -219,6 +394,198 @@ function setLocation(lat, lon, name) {
     document.getElementById('lhLat').value = lat;
     document.getElementById('lhLon').value = lon;
     placeMarker(lat, lon);
+}
+
+function metersToLat(meters) {
+    return meters / 111320;
+}
+
+function metersToLon(meters, lat) {
+    return meters / (111320 * Math.cos(lat * Math.PI / 180));
+}
+
+function zoneBounds(centerLat, centerLon, zone) {
+    const lat = centerLat + metersToLat(zone.offset_north_m || 0);
+    const lon = centerLon + metersToLon(zone.offset_east_m || 0, centerLat);
+    const halfH = metersToLat((zone.height_m || 120) / 2);
+    const halfW = metersToLon((zone.width_m || 120) / 2, centerLat);
+    return [
+        [lat - halfH, lon - halfW],
+        [lat - halfH, lon + halfW],
+        [lat + halfH, lon + halfW],
+        [lat + halfH, lon - halfW],
+    ];
+}
+
+function clearNdviOverlay() {
+    if (ndviLayerGroup) {
+        map.removeLayer(ndviLayerGroup);
+        ndviLayerGroup = null;
+    }
+    fieldBoundary = null;
+    const status = document.getElementById('ndviMapStatus');
+    if (status) status.innerText = 'NDVI overlay standby';
+}
+
+function renderNdviOverlay(lat, lon, ndvi) {
+    if (!ndvi || !map) return;
+    clearNdviOverlay();
+    ndviLayerGroup = L.layerGroup().addTo(map);
+
+    const allPoints = [];
+    (ndvi.zones || []).forEach(zone => {
+        const bounds = zoneBounds(lat, lon, zone);
+        bounds.forEach(point => allPoints.push(point));
+        L.polygon(bounds, {
+            color: 'rgba(255,255,255,0.78)',
+            weight: 1,
+            fillColor: zone.color,
+            fillOpacity: 0.58,
+            opacity: 0.85,
+        }).bindTooltip(
+            `<div class="ndvi-zone-tooltip">${zone.name}<br>NDVI ${Number(zone.ndvi).toFixed(2)} - ${zone.status}</div>`,
+            { sticky: true }
+        ).addTo(ndviLayerGroup);
+    });
+
+    if (allPoints.length) {
+        const fieldBounds = L.latLngBounds(allPoints);
+        fieldBoundary = L.rectangle(fieldBounds, {
+            color: '#ffffff',
+            weight: 2,
+            fillOpacity: 0,
+            dashArray: '6 5',
+        }).addTo(ndviLayerGroup);
+        map.fitBounds(fieldBounds, { padding: [28, 28], maxZoom: 17 });
+    }
+
+    document.getElementById('ndviMapStatus').innerText = `NDVI ${Number(ndvi.score).toFixed(2)} - ${ndvi.status}`;
+}
+
+function renderZones(zones) {
+    const zoneGrid = document.getElementById('zoneGrid');
+    zoneGrid.innerHTML = '';
+    (zones || []).forEach(zone => {
+        const card = document.createElement('div');
+        card.className = 'zone-card';
+        card.innerHTML = `
+            <div class="zone-strip" style="background:${zone.color}"></div>
+            <div>
+                <div class="zone-name">${zone.name}</div>
+                <div class="zone-status">${zone.status}</div>
+            </div>
+            <div class="zone-score">${Number(zone.ndvi).toFixed(2)}</div>
+        `;
+        zoneGrid.appendChild(card);
+    });
+}
+
+function renderSpectralChart(points) {
+    spectralPoints = points || [];
+    const canvas = document.getElementById('spectralChart');
+    if (!canvas || !spectralPoints.length) return;
+
+    const wrap = canvas.parentElement;
+    const rect = wrap.getBoundingClientRect();
+    const ratio = window.devicePixelRatio || 1;
+    canvas.width = Math.max(1, Math.round(rect.width * ratio));
+    canvas.height = Math.max(1, Math.round(rect.height * ratio));
+    canvas.style.width = `${rect.width}px`;
+    canvas.style.height = `${rect.height}px`;
+
+    const ctx = canvas.getContext('2d');
+    ctx.setTransform(ratio, 0, 0, ratio, 0, 0);
+    ctx.clearRect(0, 0, rect.width, rect.height);
+
+    const pad = { left: 44, right: 18, top: 20, bottom: 34 };
+    const w = rect.width - pad.left - pad.right;
+    const h = rect.height - pad.top - pad.bottom;
+    const wavelengths = spectralPoints.map(p => p.wavelength_nm);
+    const minX = Math.min(...wavelengths, 560);
+    const maxX = Math.max(...wavelengths, 865);
+    const maxY = 0.9;
+    const textColor = getComputedStyle(document.documentElement).getPropertyValue('--muted').trim() || '#64748b';
+    const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--border').trim() || '#e2e8f0';
+
+    function xScale(x) { return pad.left + ((x - minX) / (maxX - minX)) * w; }
+    function yScale(y) { return pad.top + h - (y / maxY) * h; }
+
+    ctx.strokeStyle = gridColor;
+    ctx.lineWidth = 1;
+    ctx.font = '11px Outfit, sans-serif';
+    ctx.fillStyle = textColor;
+
+    for (let i = 0; i <= 4; i++) {
+        const y = pad.top + (h / 4) * i;
+        ctx.beginPath();
+        ctx.moveTo(pad.left, y);
+        ctx.lineTo(pad.left + w, y);
+        ctx.stroke();
+        ctx.fillText((maxY - (maxY / 4) * i).toFixed(1), 10, y + 4);
+    }
+
+    wavelengths.forEach(wl => {
+        const x = xScale(wl);
+        ctx.fillText(String(wl), x - 10, rect.height - 10);
+    });
+
+    function drawLine(key, color) {
+        ctx.strokeStyle = color;
+        ctx.lineWidth = 3;
+        ctx.beginPath();
+        spectralPoints.forEach((point, index) => {
+            const x = xScale(point.wavelength_nm);
+            const y = yScale(point[key]);
+            if (index === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+        });
+        ctx.stroke();
+
+        ctx.fillStyle = color;
+        spectralPoints.forEach(point => {
+            ctx.beginPath();
+            ctx.arc(xScale(point.wavelength_nm), yScale(point[key]), 3.5, 0, Math.PI * 2);
+            ctx.fill();
+        });
+    }
+
+    drawLine('red', '#ef4444');
+    drawLine('nir', '#22c55e');
+
+    canvas.onmousemove = event => {
+        const box = canvas.getBoundingClientRect();
+        const x = event.clientX - box.left;
+        const nearest = spectralPoints.reduce((best, point) => {
+            const dist = Math.abs(xScale(point.wavelength_nm) - x);
+            return dist < best.dist ? { point, dist } : best;
+        }, { point: spectralPoints[0], dist: Infinity }).point;
+        const tooltip = document.getElementById('chartTooltip');
+        tooltip.style.display = 'block';
+        tooltip.style.left = `${Math.min(rect.width - 132, Math.max(8, x + 12))}px`;
+        tooltip.style.top = `${Math.max(8, event.clientY - box.top - 32)}px`;
+        tooltip.innerHTML = `${nearest.wavelength_nm} nm<br>Red: ${nearest.red}<br>NIR: ${nearest.nir}`;
+    };
+    canvas.onmouseleave = () => {
+        document.getElementById('chartTooltip').style.display = 'none';
+    };
+}
+
+function updateNdviDashboard(ndvi) {
+    if (!ndvi) return;
+    document.getElementById('lhNdvi').innerText = Number(ndvi.score).toFixed(2);
+    document.getElementById('lhVigor').innerText = ndvi.status || '--';
+    document.getElementById('lhStress').innerText = ndvi.min_zone ? ndvi.min_zone.name : '--';
+    document.getElementById('nirVal').innerText = ndvi.nir_reflectance ?? '--';
+    document.getElementById('fieldCondition').innerText = `NDVI ${Number(ndvi.score).toFixed(2)} - ${ndvi.status}`;
+    document.getElementById('ndviBadge').innerText = 'NDVI';
+
+    const banner = document.getElementById('healthBanner');
+    if (ndvi.score >= 0.62) banner.style.background = 'linear-gradient(135deg, #0b5d1e, #2f9e44)';
+    else if (ndvi.score >= 0.45) banner.style.background = 'linear-gradient(135deg, #b7791f, #f2c94c)';
+    else banner.style.background = 'linear-gradient(135deg, #b91c1c, #f97316)';
+
+    renderZones(ndvi.zones || []);
+    renderSpectralChart(ndvi.reflectance_curve || []);
 }
 
 async function analyzeField() {
@@ -248,6 +615,13 @@ async function analyzeField() {
         else if (moisture >= 10) { badge.innerText = '🟡'; document.getElementById('fieldCondition').innerText = 'Soil Health: Monitor'; }
         else { badge.innerText = '🔴'; document.getElementById('fieldCondition').innerText = 'Soil Health: Critical'; }
 
+        document.getElementById('lhdLoader').style.display = 'none';
+        document.getElementById('lhdDashboard').style.display = 'block';
+
+        const ndvi = data.ndvi_simulation;
+        updateNdviDashboard(ndvi);
+        renderNdviOverlay(parseFloat(lat), parseFloat(lon), ndvi);
+
         document.getElementById('lhdAiReport').innerHTML = (typeof marked !== 'undefined') ? marked.parse(data.ai_report) : data.ai_report;
         document.getElementById('lhdLoader').style.display = 'none';
         document.getElementById('lhdDashboard').style.display = 'block';
@@ -259,5 +633,10 @@ async function analyzeField() {
         document.getElementById('lhdEmpty').innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
     }
 }
+
+window.addEventListener('resize', () => {
+    if (spectralPoints.length) renderSpectralChart(spectralPoints);
+    if (map) map.invalidateSize();
+});
 </script>
 {% endblock %}

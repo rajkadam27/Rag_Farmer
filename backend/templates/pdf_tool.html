@@ -77,6 +77,20 @@
                     </div>
 
                     <div class="markdown-content" id="pdfResult" style="margin-top: 1.5rem;"></div>
+
+                    <!-- PDF Interactive Chatbot Section -->
+                    <div id="pdfChatSection" style="margin-top: 2rem; border-top: 1px solid var(--border); padding-top: 1.5rem; display: none;">
+                        <h4 style="font-size: 0.95rem; margin-bottom: 0.8rem; color: var(--blue); display: flex; align-items: center; gap: 0.5rem;"><i class="fa-regular fa-comments"></i> Ask follow-up questions about this document</h4>
+                        <div id="pdfChatHistory" style="max-height: 220px; overflow-y: auto; display: flex; flex-direction: column; gap: 0.8rem; margin-bottom: 1rem; padding: 0.8rem; border-radius: 12px; background: var(--bg); border: 1px solid var(--border); scrollbar-width: thin;">
+                            <div style="font-size: 0.8rem; color: var(--muted); text-align: center; font-style: italic;">Ask any question about eligibility, steps, deadlines, or required documents...</div>
+                        </div>
+                        <div style="display: flex; gap: 0.6rem;">
+                            <input type="text" id="pdfChatInput" placeholder="Type your question here..." style="flex: 1; padding: 0.8rem 1rem; border-radius: 10px; border: 1px solid var(--border); background: var(--surface); color: var(--text); font-family: inherit; font-size: 0.85rem;" onkeydown="if(event.key==='Enter') sendPdfChatMessage()">
+                            <button class="btn-primary-dash" id="pdfChatBtn" style="padding: 0.8rem 1.2rem; border-radius: 10px; min-width: 60px;" onclick="sendPdfChatMessage()">
+                                <i class="fa-solid fa-paper-plane"></i>
+                            </button>
+                        </div>
+                    </div>
                 </div>
 
                 <div id="pdfEmpty" class="empty-dashboard">
@@ -141,6 +155,7 @@
 {% block extra_js %}
 <script>
 let currentLang = 'Marathi';
+let currentPdfContext = ''; // To store the extracted context of the PDF
 
 function setLang(lang, el) {
     currentLang = lang;
@@ -167,6 +182,13 @@ async function processPdf() {
     document.getElementById('pdfResultContainer').style.display = 'none';
     document.getElementById('pdfEmpty').style.display = 'none';
 
+    // Reset Chat Box
+    document.getElementById('pdfChatHistory').innerHTML = `
+        <div style="font-size: 0.8rem; color: var(--muted); text-align: center; font-style: italic;">
+            Ask any question about eligibility, steps, deadlines, or required documents...
+        </div>`;
+    document.getElementById('pdfChatSection').style.display = 'none';
+
     try {
         const resp = await fetch('/api/pdf-summarize', {
             method: 'POST',
@@ -178,21 +200,153 @@ async function processPdf() {
         document.getElementById('pdfResultContainer').style.display = 'block';
         
         document.getElementById('pdfTitle').innerText = fileInput.files[0].name.substring(0, 25) + '...';
-        document.getElementById('pdfPoints').innerText = '6';
+        
+        // Save extracted text for chatbot Q&A
+        currentPdfContext = data.context || '';
+        
+        // ─── DYNAMIC METRICS ANALYSIS ───
+        let docType = "General Doc";
+        let textForAnalysis = (currentPdfContext + " " + (data.summary || "")).toLowerCase();
+        
+        if (textForAnalysis.includes("scheme") || textForAnalysis.includes("yojana") || textForAnalysis.includes("योजना") || textForAnalysis.includes("subsidy")) {
+            docType = "Gov Scheme";
+        } else if (textForAnalysis.includes("7/12") || textForAnalysis.includes("satbara") || textForAnalysis.includes("sat bara") || textForAnalysis.includes("भूमि") || textForAnalysis.includes("land") || textForAnalysis.includes("ferfar")) {
+            docType = "Land Record";
+        } else if (textForAnalysis.includes("soil") || textForAnalysis.includes("report") || textForAnalysis.includes("test") || textForAnalysis.includes("lab")) {
+            docType = "Lab Report";
+        } else if (textForAnalysis.includes("crop") || textForAnalysis.includes("pest") || textForAnalysis.includes("disease") || textForAnalysis.includes("farming")) {
+            docType = "Advisory Guide";
+        }
+        
+        document.getElementById('pdfType').innerText = docType;
+        
+        // Dynamic Key Points estimate based on summary sentences
+        let sentences = (data.summary || "").split(/[.!?]+/).filter(s => s.trim().length > 10).length;
+        document.getElementById('pdfPoints').innerText = sentences || '6';
+        
+        // Dynamic Complexity
+        let comp = "Low";
+        if (currentPdfContext.length > 15000) {
+            comp = "High";
+        } else if (currentPdfContext.length > 5000) {
+            comp = "Medium";
+        }
+        document.getElementById('pdfComp').innerText = comp;
+        
+        // Dynamic Estimated Read Time
+        let minutes = Math.ceil(currentPdfContext.length / 4500) || 1;
+        document.getElementById('pdfTime').innerText = minutes + 'm';
 
+        // Render Markdown summary
         const resultEl = document.getElementById('pdfResult');
         if (typeof marked !== 'undefined') {
             resultEl.innerHTML = data.summary ? marked.parse(data.summary) : 'Summary failed.';
         } else {
             resultEl.innerText = data.summary;
         }
+
+        // Display follow-up chat box if document has extractable text
+        if (currentPdfContext.trim().length > 0) {
+            document.getElementById('pdfChatSection').style.display = 'block';
+        }
+
         document.getElementById('pdfResultArea').scrollTop = 0;
 
     } catch(e) {
         document.getElementById('pdfLoader').style.display = 'none';
         document.getElementById('pdfEmpty').style.display = 'flex';
-        document.getElementById('pdfEmpty').innerHTML = `<p style="color:red">Error: ${e.message}</p>`;
+        document.getElementById('pdfEmpty').innerHTML = `<p style="color:red; text-align:center;">Error: ${e.message}</p>`;
     }
+}
+
+async function sendPdfChatMessage() {
+    const inputEl = document.getElementById('pdfChatInput');
+    const question = inputEl.value.trim();
+    if (!question) return;
+
+    const chatHistory = document.getElementById('pdfChatHistory');
+    const chatBtn = document.getElementById('pdfChatBtn');
+
+    // Remove placeholder on first message
+    if (chatHistory.querySelector('div[style*="font-style: italic"]')) {
+        chatHistory.innerHTML = '';
+    }
+
+    // Append User message to bubble history
+    const userMsg = document.createElement('div');
+    userMsg.style.cssText = "align-self: flex-end; background: var(--blue); color: white; padding: 0.6rem 0.9rem; border-radius: 12px 12px 0 12px; max-width: 85%; font-size: 0.85rem; line-height: 1.4; word-break: break-word;";
+    userMsg.innerHTML = `<strong>You:</strong> ${escapeHtml(question)}`;
+    chatHistory.appendChild(userMsg);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+    // Reset input and disable interface
+    inputEl.value = '';
+    inputEl.disabled = true;
+    chatBtn.disabled = true;
+    chatBtn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i>';
+
+    // Append loading bubble
+    const aiLoader = document.createElement('div');
+    aiLoader.id = 'aiChatLoader';
+    aiLoader.style.cssText = "align-self: flex-start; background: var(--surface); border: 1px solid var(--border); padding: 0.6rem 0.9rem; border-radius: 12px 12px 12px 0; font-size: 0.85rem; color: var(--muted);";
+    aiLoader.innerHTML = `<i class="fa-solid fa-circle-notch fa-spin"></i> Analyzing...`;
+    chatHistory.appendChild(aiLoader);
+    chatHistory.scrollTop = chatHistory.scrollHeight;
+
+    try {
+        const resp = await fetch('/api/pdf-chat', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                question: question,
+                context: currentPdfContext,
+                language: currentLang
+            })
+        });
+        const data = await resp.json();
+
+        // Remove loading bubble
+        const loader = document.getElementById('aiChatLoader');
+        if (loader) loader.remove();
+
+        // Append AI response bubble
+        const aiMsg = document.createElement('div');
+        aiMsg.style.cssText = "align-self: flex-start; background: var(--surface); border: 1px solid var(--border); color: var(--text); padding: 0.6rem 0.9rem; border-radius: 12px 12px 12px 0; max-width: 85%; font-size: 0.85rem; line-height: 1.4; word-break: break-word;";
+        
+        let responseText = data.response || 'Could not fetch a response.';
+        if (typeof marked !== 'undefined') {
+            aiMsg.innerHTML = `<strong>AI:</strong> ${marked.parse(responseText)}`;
+        } else {
+            aiMsg.innerHTML = `<strong>AI:</strong> ${responseText}`;
+        }
+        
+        chatHistory.appendChild(aiMsg);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+
+    } catch (e) {
+        const loader = document.getElementById('aiChatLoader');
+        if (loader) loader.remove();
+
+        const errorMsg = document.createElement('div');
+        errorMsg.style.cssText = "align-self: flex-start; background: #fee2e2; color: #ef4444; border: 1px solid #fca5a5; padding: 0.6rem 0.9rem; border-radius: 12px; font-size: 0.85rem;";
+        errorMsg.innerText = `Connection Error: ${e.message}`;
+        chatHistory.appendChild(errorMsg);
+        chatHistory.scrollTop = chatHistory.scrollHeight;
+    } finally {
+        inputEl.disabled = false;
+        chatBtn.disabled = false;
+        chatBtn.innerHTML = '<i class="fa-solid fa-paper-plane"></i>';
+        inputEl.focus();
+    }
+}
+
+function escapeHtml(text) {
+    return text
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
 }
 </script>
 {% endblock %}
