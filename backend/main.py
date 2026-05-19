@@ -8,10 +8,10 @@ from pathlib import Path
 from dotenv import load_dotenv
 
 # Load environment variables
-load_dotenv(dotenv_path=Path(__file__).resolve().parents[2] / ".env")
+load_dotenv(dotenv_path=Path(__file__).resolve().parent.parent / ".env")
 
 # Import routers
-from .routers import query, voice
+from backend.routers import query, voice
 
 app = FastAPI(title="Maharashtra Farmer Advisory System")
 
@@ -33,12 +33,13 @@ from bot.whatsapp import router as whatsapp_router
 app.include_router(whatsapp_router, prefix="/api")
 
 # New AI Features Router
-from .routers import features
+from backend.routers import features
 app.include_router(features.router, prefix="/api")
 
 # Setup Templates & Static Files
-templates = Jinja2Templates(directory="backend/templates")
-app.mount("/static", StaticFiles(directory="backend/static"), name="static")
+BASE_DIR = Path(__file__).resolve().parent
+templates = Jinja2Templates(directory=str(BASE_DIR / "templates"))
+app.mount("/static", StaticFiles(directory=str(BASE_DIR / "static")), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def read_advisor(request: Request):
