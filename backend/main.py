@@ -145,6 +145,16 @@ async def read_land_health_map(request: Request):
     return templates.TemplateResponse(request=request, name="land_health.html",
         context={"active_page": "landhealth", "page_title": "Land Health Dashboard"})
 
+@app.get("/gr-portal", response_class=HTMLResponse)
+async def read_gr_portal(request: Request):
+    return templates.TemplateResponse(request=request, name="gr_rag.html",
+        context={"active_page": "gr", "page_title": "GR RAG Portal"})
+
+@app.get("/mandi-arbitrage", response_class=HTMLResponse)
+async def read_mandi_arbitrage(request: Request):
+    return templates.TemplateResponse(request=request, name="mandi_arbitrage.html",
+        context={"active_page": "arbitrage", "page_title": "Mandi Arbitrage"})
+
 @app.get("/health")
 async def health_check():
     return {"status": "ok"}

@@ -185,6 +185,10 @@ async function fetchFieldHealth() {
             document.getElementById('fhAiReport').innerText = data.ai_report || '';
         }
 
+        if (typeof logTransaction === 'function') {
+            logTransaction('Field Health Monitor', `Field Analysis for Lat: ${lat}, Lon: ${lon}`, data.ai_report);
+        }
+
         document.getElementById('fhLoader').style.display = 'none';
         document.getElementById('fhContent').style.display = 'block';
         document.getElementById('fhResultArea').scrollTop = 0;

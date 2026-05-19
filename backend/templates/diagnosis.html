@@ -194,6 +194,11 @@ async function diagnoseCrop() {
         } else {
             resultEl.innerText = data.diagnosis;
         }
+
+        if (typeof logTransaction === 'function') {
+            logTransaction('Crop Diagnosis', `AI Pest/Disease diagnosis report`, data.diagnosis);
+        }
+
         document.getElementById('diagResultArea').scrollTop = 0;
 
     } catch(e) {

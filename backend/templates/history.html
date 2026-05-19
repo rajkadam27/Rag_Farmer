@@ -5,55 +5,117 @@
 {% block content %}
 <div class="history-page">
     <div class="header-section">
-        <h2>Your Consultation Log</h2>
-        <p>Review your past AI expert consultations and advice reports.</p>
+        <h2><i class="fa-solid fa-clock-rotate-left" style="color:var(--gov-orange)"></i> Your Consultation Log</h2>
+        <p>Review your past AI expert consultations and advisory reports stored securely on your browser.</p>
+        <button class="btn-clear-history" onclick="clearLogs()"><i class="fa-solid fa-trash-can"></i> Clear All Logs</button>
     </div>
 
-    <div class="history-table-wrapper">
+    <!-- Dynamic History Container -->
+    <div class="history-table-wrapper" id="historyTableWrapper" style="display: none;">
         <table class="history-table">
             <thead>
                 <tr>
-                    <th>Date</th>
-                    <th>Topic / Question</th>
+                    <th>Date & Time</th>
+                    <th>Module / Service</th>
+                    <th>Your Query</th>
                     <th>Language</th>
-                    <th>Status</th>
                     <th>Action</th>
                 </tr>
             </thead>
-            <tbody>
-                <tr>
-                    <td>12 May 2024</td>
-                    <td>Ladki Bahin Yojana benefits and process</td>
-                    <td>English</td>
-                    <td><span class="status-badge">Completed</span></td>
-                    <td><a href="/" class="btn-open">View Report</a></td>
-                </tr>
-                <tr>
-                    <td>11 May 2024</td>
-                    <td>कापूस पिकावरील लाल्या रोग उपाय</td>
-                    <td>Marathi</td>
-                    <td><span class="status-badge">Completed</span></td>
-                    <td><a href="/" class="btn-open">View Report</a></td>
-                </tr>
-                <tr>
-                    <td>10 May 2024</td>
-                    <td>PM-Kisan installment status</td>
-                    <td>Hindi</td>
-                    <td><span class="status-badge">Completed</span></td>
-                    <td><a href="/" class="btn-open">View Report</a></td>
-                </tr>
-            </tbody>
+            <tbody id="historyTableBody"></tbody>
         </table>
+    </div>
+
+    <!-- Premium Empty State -->
+    <div id="historyEmptyState" class="empty-history" style="display: none;">
+        <i class="fa-solid fa-folder-open"></i>
+        <h3>No Consultation History Yet</h3>
+        <p>Your interactions with the AI Advisor, Mandi Price tool, Crop Diagnosis, and Sowing Planner will show up here.</p>
+        <a href="/" class="btn-go-home"><i class="fa-solid fa-wand-magic-sparkles"></i> Consult AI Advisor Now</a>
+    </div>
+</div>
+
+<!-- Details Modal -->
+<div id="detailsModal" class="modal-overlay" style="display: none;" onclick="closeModal(event)">
+    <div class="modal-card" onclick="event.stopPropagation()">
+        <div class="modal-header">
+            <div>
+                <h3 id="modalType">Consultation Report</h3>
+                <span id="modalDate">Date</span>
+            </div>
+            <button class="close-modal-btn" onclick="closeModal()"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="modal-body scroll-y">
+            <div class="modal-query-box">
+                <strong>Your Query:</strong>
+                <p id="modalQuery">Query text</p>
+            </div>
+            <div class="modal-report-box">
+                <strong>AI Advisory Report:</strong>
+                <div id="modalReport" class="markdown-content">Report content</div>
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_css %}
+.history-page {
+    max-width: 1100px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+}
+
+.header-section h2 {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: var(--text);
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+}
+
+.header-section p {
+    color: var(--muted);
+    font-size: 0.9rem;
+    width: 100%;
+}
+
+.btn-clear-history {
+    background: transparent;
+    border: 1.5px solid #ef4444;
+    color: #ef4444;
+    padding: 0.5rem 1rem;
+    border-radius: 8px;
+    font-weight: 700;
+    font-size: 0.82rem;
+    cursor: pointer;
+    transition: 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-clear-history:hover {
+    background: #ef4444;
+    color: white;
+}
+
 .history-table-wrapper {
     background: var(--surface);
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid var(--border);
-    margin-top: 2rem;
+    margin-top: 1.5rem;
     overflow: hidden;
     box-shadow: var(--shadow);
 }
@@ -66,36 +128,337 @@
 .history-table th {
     background: var(--bg);
     text-align: left;
-    padding: 1rem 1.5rem;
-    font-size: 0.85rem;
+    padding: 1rem 1.2rem;
+    font-size: 0.8rem;
     font-weight: 800;
-    color: var(--text);
+    color: var(--muted);
     text-transform: uppercase;
-    border-bottom: 2px solid var(--border);
+    border-bottom: 1.5px solid var(--border);
 }
 
 .history-table td {
-    padding: 1.2rem 1.5rem;
+    padding: 1.1rem 1.2rem;
     border-bottom: 1px solid var(--border);
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     color: var(--text);
 }
 
-.status-badge {
-    background: rgba(40, 167, 69, 0.1);
-    color: var(--green);
-    padding: 0.3rem 0.8rem;
-    border-radius: 20px;
+.history-table tr:last-child td {
+    border-bottom: none;
+}
+
+.module-badge {
+    background: rgba(26, 86, 219, 0.1);
+    color: var(--blue);
+    padding: 0.25rem 0.6rem;
+    border-radius: 6px;
     font-size: 0.75rem;
     font-weight: 700;
+    display: inline-block;
 }
 
-.btn-open {
+.lang-badge {
+    background: var(--bg);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    font-size: 0.72rem;
+    font-weight: 600;
+}
+
+.btn-view-report {
+    background: var(--bg);
+    border: 1px solid var(--border);
     color: var(--blue);
-    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
     font-weight: 700;
-    font-size: 0.85rem;
+    font-size: 0.8rem;
+    cursor: pointer;
+    transition: 0.2s;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
 }
 
-.btn-open:hover { text-decoration: underline; }
+.btn-view-report:hover {
+    background: var(--blue);
+    color: white;
+    border-color: var(--blue);
+}
+
+/* Empty State */
+.empty-history {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 4rem 1.5rem;
+    background: var(--surface);
+    border: 1px dashed var(--border);
+    border-radius: 20px;
+    margin-top: 2rem;
+}
+
+.empty-history i {
+    font-size: 4rem;
+    color: var(--border);
+    margin-bottom: 1.5rem;
+}
+
+.empty-history h3 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 0.5rem;
+}
+
+.empty-history p {
+    font-size: 0.88rem;
+    color: var(--muted);
+    max-width: 320px;
+    margin-bottom: 1.5rem;
+    line-height: 1.6;
+}
+
+.btn-go-home {
+    background: var(--blue);
+    color: white;
+    border: none;
+    padding: 0.8rem 1.5rem;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 0.9rem;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: 0.2s;
+}
+
+.btn-go-home:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 15px rgba(26, 86, 219, 0.25);
+}
+
+/* Details Modal Overlay */
+.modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(15, 23, 42, 0.6);
+    backdrop-filter: blur(4px);
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 1rem;
+}
+
+.modal-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 20px;
+    width: 100%;
+    max-width: 680px;
+    max-height: 80vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.15);
+    animation: modalSlide 0.25s ease-out;
+}
+
+@keyframes modalSlide {
+    from { transform: translateY(30px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-header {
+    padding: 1.2rem 1.5rem;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--bg);
+}
+
+.modal-header h3 {
+    font-size: 1.15rem;
+    font-weight: 800;
+    color: var(--text);
+}
+
+.modal-header span {
+    font-size: 0.72rem;
+    color: var(--muted);
+    font-weight: 700;
+}
+
+.close-modal-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.3rem;
+    color: var(--muted);
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.close-modal-btn:hover {
+    color: #ef4444;
+}
+
+.modal-body {
+    padding: 1.5rem;
+    flex: 1;
+    overflow-y: auto;
+}
+
+.modal-query-box {
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.modal-query-box strong {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+}
+
+.modal-query-box p {
+    font-size: 0.95rem;
+    font-weight: 600;
+    color: var(--text);
+    margin-top: 0.3rem;
+}
+
+.modal-report-box strong {
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--muted);
+    display: block;
+    margin-bottom: 0.6rem;
+}
+
+.scroll-y {
+    overflow-y: auto;
+    scrollbar-width: thin;
+    scrollbar-color: var(--border) transparent;
+}
+.scroll-y::-webkit-scrollbar {
+    width: 6px;
+}
+.scroll-y::-webkit-scrollbar-thumb {
+    background-color: var(--border);
+    border-radius: 10px;
+}
+
+.markdown-content {
+    font-size: 0.92rem;
+    line-height: 1.75;
+    color: var(--text);
+}
+.markdown-content h1, .markdown-content h2, .markdown-content h3 {
+    color: var(--blue);
+    margin-top: 1.2rem;
+    margin-bottom: 0.6rem;
+}
+.markdown-content ul, .markdown-content ol {
+    margin-left: 1.2rem;
+    margin-bottom: 1rem;
+}
+.markdown-content li {
+    margin-bottom: 0.4rem;
+}
+.markdown-content p {
+    margin-bottom: 0.8rem;
+}
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let logs = [];
+
+// Load logs on startup
+window.addEventListener('load', function() {
+    loadLogs();
+});
+
+function loadLogs() {
+    try {
+        logs = JSON.parse(localStorage.getItem('farmer_adv_logs') || '[]');
+    } catch(e) {
+        logs = [];
+    }
+
+    const wrapper = document.getElementById('historyTableWrapper');
+    const emptyState = document.getElementById('historyEmptyState');
+    const tbody = document.getElementById('historyTableBody');
+
+    if (logs.length === 0) {
+        wrapper.style.display = 'none';
+        emptyState.style.display = 'flex';
+    } else {
+        wrapper.style.display = 'block';
+        emptyState.style.display = 'none';
+        tbody.innerHTML = '';
+
+        logs.forEach((log, index) => {
+            const tr = document.createElement('tr');
+            
+            // Truncate query for display
+            const displayQuery = log.query.length > 55 ? log.query.substring(0, 55) + '...' : log.query;
+            
+            tr.innerHTML = `
+                <td style="font-weight:600; color:var(--muted); font-size:0.8rem;">${log.date}</td>
+                <td><span class="module-badge">${log.type}</span></td>
+                <td style="font-weight:500;">${displayQuery}</td>
+                <td><span class="lang-badge">${log.language}</span></td>
+                <td>
+                    <button class="btn-view-report" onclick="viewReport(${index})">
+                        <i class="fa-solid fa-file-invoice"></i> View Report
+                    </button>
+                </td>
+            `;
+            tbody.appendChild(tr);
+        });
+    }
+}
+
+function viewReport(index) {
+    const log = logs[index];
+    if (!log) return;
+
+    document.getElementById('modalType').innerText = log.type;
+    document.getElementById('modalDate').innerText = log.date;
+    document.getElementById('modalQuery').innerText = log.query;
+    
+    const reportEl = document.getElementById('modalReport');
+    if (typeof marked !== 'undefined') {
+        reportEl.innerHTML = marked.parse(log.result || '');
+    } else {
+        reportEl.innerText = log.result || '';
+    }
+
+    document.getElementById('detailsModal').style.display = 'flex';
+}
+
+function closeModal(event) {
+    document.getElementById('detailsModal').style.display = 'none';
+}
+
+function clearLogs() {
+    if (confirm('Are you sure you want to delete your entire consultation history?')) {
+        localStorage.removeItem('farmer_adv_logs');
+        loadLogs();
+    }
+}
+</script>
 {% endblock %}

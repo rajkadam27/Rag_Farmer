@@ -97,6 +97,37 @@
                         </div>
                     </div>
 
+                    <!-- Chart Panel -->
+                    <div class="mandi-chart-panel" id="mandiChartPanel" style="margin-top: 1.5rem;">
+                        <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; color: var(--blue);">
+                            <i class="fa-solid fa-chart-column"></i> APMC Market Price Comparison
+                        </h3>
+                        <div class="chart-wrapper">
+                            <canvas id="mandiChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- Market Table -->
+                    <div class="mandi-table-panel" id="mandiTablePanel" style="margin-top: 1.5rem;">
+                        <h3 style="font-size: 0.95rem; font-weight: 800; margin-bottom: 0.8rem; display: flex; align-items: center; gap: 0.5rem; color: var(--blue);">
+                            <i class="fa-solid fa-table-list"></i> Market-wise Price Breakout
+                        </h3>
+                        <div class="table-scroll">
+                            <table class="apmc-table">
+                                <thead>
+                                    <tr>
+                                        <th>Market (APMC)</th>
+                                        <th>Min Price</th>
+                                        <th>Max Price</th>
+                                        <th>Modal Price</th>
+                                        <th>Date Reported</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="apmcTableBody"></tbody>
+                            </table>
+                        </div>
+                    </div>
+
                     <div class="markdown-content" id="mAiReport" style="margin-top: 1.5rem;"></div>
                 </div>
 
@@ -140,6 +171,13 @@
 .m-val { font-size: 1.4rem; font-weight: 800; color: var(--blue); }
 .m-unit { font-size: 0.68rem; color: var(--muted); font-weight: 600; }
 
+.chart-wrapper { position: relative; height: 260px; background: var(--bg); border: 1px solid var(--border); border-radius: 12px; padding: 0.8rem; }
+.table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: 12px; background: var(--bg); }
+.apmc-table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+.apmc-table th { padding: 0.8rem 1rem; color: var(--muted); font-weight: 800; text-transform: uppercase; text-align: left; border-bottom: 1.5px solid var(--border); background: rgba(0,0,0,0.01); }
+.apmc-table td { padding: 0.8rem 1rem; color: var(--text); border-bottom: 1px solid var(--border); }
+.apmc-table tr:last-child td { border-bottom: none; }
+
 .dash-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 300px; gap: 1rem; color: var(--muted); }
 .pulse-ring { width: 50px; height: 50px; border: 4px solid var(--green); border-radius: 50%; animation: spin-pulse 1.2s infinite; }
 @keyframes spin-pulse { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
@@ -163,13 +201,110 @@
 {% endblock %}
 
 {% block extra_js %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <script>
     let currentLang = 'Marathi';
+    let mandiChartInstance = null;
 
     function setLang(lang, el) {
         currentLang = lang;
         document.querySelectorAll('.lang-pill').forEach(b => b.classList.remove('active'));
         el.classList.add('active');
+    }
+
+    function renderMandiChart(prices) {
+        const canvas = document.getElementById('mandiChart');
+        if (!canvas || !prices || prices.length === 0) return;
+        const ctx = canvas.getContext('2d');
+
+        if (mandiChartInstance) {
+            mandiChartInstance.destroy();
+        }
+
+        const labels = prices.map(p => p.market);
+        const modals = prices.map(p => parseFloat(p.modal_price) || 0);
+        const mins = prices.map(p => parseFloat(p.min_price) || 0);
+        const maxs = prices.map(p => parseFloat(p.max_price) || 0);
+
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        const labelColor = isDark ? '#e6edf3' : '#1e293b';
+        const gridColor = isDark ? '#30363d' : '#e2e8f0';
+
+        mandiChartInstance = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Min Price (₹)',
+                        data: mins,
+                        backgroundColor: '#ef4444',
+                        borderColor: '#dc2626',
+                        borderWidth: 1.5,
+                        borderRadius: 6,
+                    },
+                    {
+                        label: 'Modal Price (₹)',
+                        data: modals,
+                        backgroundColor: '#3b82f6',
+                        borderColor: '#2563eb',
+                        borderWidth: 1.5,
+                        borderRadius: 6,
+                    },
+                    {
+                        label: 'Max Price (₹)',
+                        data: maxs,
+                        backgroundColor: '#10b981',
+                        borderColor: '#059669',
+                        borderWidth: 1.5,
+                        borderRadius: 6,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        labels: {
+                            color: labelColor,
+                            font: { family: 'Outfit', weight: 600 }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        grid: { color: gridColor },
+                        ticks: { color: labelColor, font: { family: 'Outfit' } }
+                    },
+                    y: {
+                        grid: { color: gridColor },
+                        ticks: { color: labelColor, font: { family: 'Outfit' } }
+                    }
+                }
+            }
+        });
+    }
+
+    function renderMandiTable(prices) {
+        const tbody = document.getElementById('apmcTableBody');
+        tbody.innerHTML = '';
+        if (!prices || prices.length === 0) {
+            tbody.innerHTML = `<tr><td colspan="5" style="text-align:center; color:var(--muted);">No market records found.</td></tr>`;
+            return;
+        }
+
+        prices.forEach(p => {
+            const tr = document.createElement('tr');
+            tr.innerHTML = `
+                <td style="font-weight:700;">${p.market}</td>
+                <td style="color:#ef4444; font-weight:600;">₹${p.min_price}</td>
+                <td style="color:#10b981; font-weight:600;">₹${p.max_price}</td>
+                <td style="color:#3b82f6; font-weight:700; font-size:0.9rem;">₹${p.modal_price}</td>
+                <td style="color:var(--muted); font-size:0.75rem;">${p.date}</td>
+            `;
+            tbody.appendChild(tr);
+        });
     }
 
     async function fetchMandi() {
@@ -197,8 +332,15 @@
                 document.getElementById('mModal').innerText = p.modal_price || '—';
                 document.getElementById('mMax').innerText = p.max_price || '—';
                 document.getElementById('mMin').innerText = p.min_price || '—';
-                document.getElementById('mTrend').innerText = data.advice && data.advice.includes('Hold') ? 'Hold' : 'Sell';
+                
+                const isHold = data.advice && (data.advice.toLowerCase().includes('hold') || data.advice.toLowerCase().includes('ठेवायचे'));
+                document.getElementById('mTrend').innerText = isHold ? 'Hold' : 'Sell';
+                document.getElementById('mTrend').style.color = isHold ? 'var(--orange)' : 'var(--green)';
             }
+
+            // Render Chart and Table Comparison
+            renderMandiChart(data.prices || []);
+            renderMandiTable(data.prices || []);
 
             // Update AI Advice
             const adviceEl = document.getElementById('mAiReport');
@@ -207,6 +349,12 @@
             } else {
                 adviceEl.innerText = data.advice;
             }
+
+            // Log this transaction to history
+            if (typeof logTransaction === 'function') {
+                logTransaction('Mandi Intelligence', `Live prices for ${commodity} in ${state}`, data.advice);
+            }
+
             document.getElementById('mandiResultArea').scrollTop = 0;
 
         } catch (e) {

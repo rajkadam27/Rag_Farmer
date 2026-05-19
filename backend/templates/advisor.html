@@ -185,6 +185,11 @@
             } else {
                 resultEl.innerText = data.answer;
             }
+
+            if (typeof logTransaction === 'function') {
+                logTransaction('AI Chat Advisory', query, data.answer);
+            }
+
             document.getElementById('advResultArea').scrollTop = 0;
 
         } catch (e) {

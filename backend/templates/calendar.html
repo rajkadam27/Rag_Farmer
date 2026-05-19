@@ -1,132 +1,176 @@
 {% extends "base.html" %}
-{% block title %}Sowing Calendar | Maha-Advisory{% endblock %}
+
+{% block title %}Climate-Smart Sowing Calendar | Maha-Advisory{% endblock %}
 
 {% block content %}
-<div class="cal-page">
-    <div class="header-section">
-        <h2><i class="fa-solid fa-calendar-days" style="color:var(--gov-orange)"></i> Sowing Calendar — Maharashtra</h2>
-        <p>Month-wise guide for optimal sowing, planting, and harvesting of major crops in Maharashtra.</p>
-    </div>
-
-    <div class="season-tabs">
-        <button class="stab active" onclick="showSeason('kharif')"><i class="fa-solid fa-cloud-rain"></i> Kharif (खरीप)</button>
-        <button class="stab" onclick="showSeason('rabi')"><i class="fa-solid fa-snowflake"></i> Rabi (रब्बी)</button>
-        <button class="stab" onclick="showSeason('summer')"><i class="fa-solid fa-sun"></i> Summer (उन्हाळी)</button>
-    </div>
-
-    <!-- Kharif -->
-    <div id="kharif" class="season-content">
-        <div class="season-notice kharif-notice">
-            <i class="fa-solid fa-info-circle"></i>
-            <strong>Kharif Season (June - November):</strong> Main sowing starts after pre-monsoon showers. Ensure soil has adequate moisture before sowing.
+<div class="calendar-container">
+    <div class="dash-header">
+        <div class="dash-title">
+            <h2><i class="fa-solid fa-calendar-days" style="color:var(--gov-orange)"></i> Climate-Smart Sowing Planner</h2>
+            <p>Real-time district weather forecasting integrated with AI sowing window recommendations.</p>
         </div>
-        <div class="crop-cal-grid">
-            <div class="crop-cal-card">
-                <div class="crop-cal-header" style="background:#1a6b1a"><i class="fa-solid fa-leaf"></i> Cotton (BT कापूस)</div>
-                <div class="crop-cal-body">
-                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val kharif-chip">June 1st - July 15</span></div>
-                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">October - February</span></div>
-                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">BG-II, NHH-44</span></div>
-                    <div class="cal-row"><span class="cal-label">Districts</span><span class="cal-val">Vidarbha, Marathwada</span></div>
-                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Apply Urea at 30 DAS for early boll formation.</div>
-                </div>
-            </div>
-            <div class="crop-cal-card">
-                <div class="crop-cal-header" style="background:#005580"><i class="fa-solid fa-circle"></i> Soybean (सोयाबीन)</div>
-                <div class="crop-cal-body">
-                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val kharif-chip">June 15 - July 15</span></div>
-                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">October - November</span></div>
-                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">JS-335, MAUS-71</span></div>
-                    <div class="cal-row"><span class="cal-label">Districts</span><span class="cal-val">All Maharashtra</span></div>
-                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Seed treatment with Rhizobium culture improves yield by 15%.</div>
-                </div>
-            </div>
-            <div class="crop-cal-card">
-                <div class="crop-cal-header" style="background:#7d4200"><i class="fa-solid fa-droplet"></i> Rice (भात)</div>
-                <div class="crop-cal-body">
-                    <div class="cal-row"><span class="cal-label">Nursery</span><span class="cal-val kharif-chip">June 1 - June 20</span></div>
-                    <div class="cal-row"><span class="cal-label">Transplanting</span><span class="cal-val">July 1 - August 15</span></div>
-                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">Indrayani, PKV Sona</span></div>
-                    <div class="cal-row"><span class="cal-label">Districts</span><span class="cal-val">Konkan, Nashik</span></div>
-                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Maintain 5cm water level during tillering stage.</div>
-                </div>
-            </div>
-            <div class="crop-cal-card">
-                <div class="crop-cal-header" style="background:#5c3d00"><i class="fa-solid fa-pepper-hot"></i> Tur / Pigeon Pea (तूर)</div>
-                <div class="crop-cal-body">
-                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val kharif-chip">June 15 - July 15</span></div>
-                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">January - February</span></div>
-                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">ICPL-87, BDN-2</span></div>
-                    <div class="cal-row"><span class="cal-label">Districts</span><span class="cal-val">Latur, Solapur</span></div>
-                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Use weed control at 20-25 DAS for maximum grain yield.</div>
-                </div>
-            </div>
+        <div class="lang-pill-selector">
+            <button class="lang-pill active" onclick="setPlannerLang('Marathi', this)">मराठी</button>
+            <button class="lang-pill" onclick="setPlannerLang('Hindi', this)">हिंदी</button>
+            <button class="lang-pill" onclick="setPlannerLang('English', this)">English</button>
         </div>
     </div>
 
-    <!-- Rabi -->
-    <div id="rabi" class="season-content" style="display:none">
-        <div class="season-notice rabi-notice">
-            <i class="fa-solid fa-info-circle"></i>
-            <strong>Rabi Season (October - March):</strong> Sown after monsoon. Primarily depends on residual soil moisture or irrigation.
-        </div>
-        <div class="crop-cal-grid">
-            <div class="crop-cal-card">
-                <div class="crop-cal-header" style="background:#4a1080"><i class="fa-solid fa-wheat-awn"></i> Wheat (गहू)</div>
-                <div class="crop-cal-body">
-                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val rabi-chip">Nov 1 - Dec 15</span></div>
-                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">March - April</span></div>
-                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">NW-1014, K-307</span></div>
-                    <div class="cal-row"><span class="cal-label">Irrigation</span><span class="cal-val">4-5 irrigations needed</span></div>
-                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> First irrigation (Crown Root Initiation) is most critical at 21 DAS.</div>
+    <div class="calendar-grid">
+        <!-- LEFT: AI Sowing Suitability Tool -->
+        <div class="dash-card input-card">
+            <div class="card-header"><i class="fa-solid fa-clock-rotate-left"></i> Check Sowing Readiness</div>
+            <div class="card-body">
+                <div class="input-group">
+                    <label>Select District</label>
+                    <select id="sowDistrict">
+                        <option value="Satara">Satara (सातारा)</option>
+                        <option value="Pune">Pune (पुणे)</option>
+                        <option value="Nashik">Nashik (नाशिक)</option>
+                        <option value="Nagpur">Nagpur (नागपूर)</option>
+                        <option value="Aurangabad">Aurangabad (छत्रपती संभाजीनगर)</option>
+                        <option value="Solapur">Solapur (सोलापूर)</option>
+                        <option value="Jalgaon">Jalgaon (जळगाव)</option>
+                        <option value="Amravati">Amravati (अमरावती)</option>
+                        <option value="Kolhapur">Kolhapur (कोल्हापूर)</option>
+                        <option value="Nanded">Nanded (नांदेड)</option>
+                        <option value="Latur">Latur (लातूर)</option>
+                        <option value="Ahmednagar">Ahmednagar (अहमदनगर)</option>
+                    </select>
                 </div>
-            </div>
-            <div class="crop-cal-card">
-                <div class="crop-cal-header" style="background:#8b0000"><i class="fa-solid fa-circle"></i> Onion (कांदा)</div>
-                <div class="crop-cal-body">
-                    <div class="cal-row"><span class="cal-label">Nursery</span><span class="cal-val rabi-chip">Sept 15 - Oct 15</span></div>
-                    <div class="cal-row"><span class="cal-label">Transplanting</span><span class="cal-val">Nov - Dec</span></div>
-                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">February - March</span></div>
-                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">N-2-4-1, Bhima Raj</span></div>
-                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Stop irrigation 15 days before harvest to improve storage life.</div>
-                </div>
-            </div>
-            <div class="crop-cal-card">
-                <div class="crop-cal-header" style="background:#006644"><i class="fa-solid fa-seedling"></i> Gram / Chickpea (हरभरा)</div>
-                <div class="crop-cal-body">
-                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val rabi-chip">Oct 15 - Nov 15</span></div>
-                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">February - March</span></div>
-                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">Vishal, PKV-2</span></div>
-                    <div class="cal-row"><span class="cal-label">District</span><span class="cal-val">Marathwada, Vidarbha</span></div>
-                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Single irrigation at pre-flowering is highly beneficial.</div>
-                </div>
-            </div>
-        </div>
-    </div>
 
-    <!-- Summer -->
-    <div id="summer" class="season-content" style="display:none">
-        <div class="season-notice summer-notice">
-            <i class="fa-solid fa-info-circle"></i>
-            <strong>Summer Season (February - May):</strong> Irrigation-dependent crops. Requires careful water management.
-        </div>
-        <div class="crop-cal-grid">
-            <div class="crop-cal-card">
-                <div class="crop-cal-header" style="background:#b35900"><i class="fa-solid fa-pepper-hot"></i> Groundnut (भुईमूग)</div>
-                <div class="crop-cal-body">
-                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val summer-chip">Jan 15 - Feb 28</span></div>
-                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">May - June</span></div>
-                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">JL-24, Phule Pragati</span></div>
-                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Gypsum application at 200 kg/acre helps pod filling.</div>
+                <div class="input-group" style="margin-top: 1rem;">
+                    <label>Crop to Sow</label>
+                    <select id="sowCrop">
+                        <option value="Soybean">Soybean (सोयाबीन)</option>
+                        <option value="Cotton">Cotton (कापूस)</option>
+                        <option value="Rice">Rice / Paddy (भात)</option>
+                        <option value="Wheat">Wheat (गहू)</option>
+                        <option value="Gram">Gram / Chickpea (हरभरा)</option>
+                        <option value="Groundnut">Groundnut (भुईमूग)</option>
+                        <option value="Sugarcane">Sugarcane (ऊस)</option>
+                    </select>
+                </div>
+
+                <button class="btn-primary-dash" onclick="calculateSowingWindow()">
+                    Calculate Sowing Window <i class="fa-solid fa-cloud-sun-rain"></i>
+                </button>
+
+                <div class="sow-helper-info" style="margin-top: 1.5rem;">
+                    <i class="fa-solid fa-circle-info"></i>
+                    <strong>How it works:</strong> We pull the 7-day temperature & rainfall forecast for your district and use Gemini to calculate soil hydration and temperature fits.
                 </div>
             </div>
-            <div class="crop-cal-card">
-                <div class="crop-cal-header" style="background:#1e6b00"><i class="fa-solid fa-circle"></i> Sunflower (सूर्यफूल)</div>
-                <div class="crop-cal-body">
-                    <div class="cal-row"><span class="cal-label">Sowing Time</span><span class="cal-val summer-chip">Jan 15 - Mar 1</span></div>
-                    <div class="cal-row"><span class="cal-label">Harvesting</span><span class="cal-val">May</span></div>
-                    <div class="cal-row"><span class="cal-label">Variety</span><span class="cal-val">MSFH-17, CO-1</span></div>
-                    <div class="cal-tip"><i class="fa-solid fa-lightbulb"></i> Hand pollination during morning hours increases seed set.</div>
+        </div>
+
+        <!-- RIGHT: Results or Static Calendar -->
+        <div class="dash-card result-card">
+            <div class="card-header"><i class="fa-solid fa-chart-pie"></i> Sowing Readiness & Schedule</div>
+            <div class="card-body scroll-y" id="calResultArea">
+                <div id="calLoader" style="display:none" class="dash-loader">
+                    <div class="pulse-ring"></div>
+                    <p>Fetching forecast and computing soil readiness...</p>
+                </div>
+
+                <!-- AI Output Section -->
+                <div id="calAiOutput" style="display:none">
+                    <div class="planner-metrics">
+                        <!-- Circular Score Gauge -->
+                        <div class="score-gauge-wrap">
+                            <div class="score-circle-outer" id="scoreCircle">
+                                <div class="score-circle-inner">
+                                    <span id="scoreVal">85%</span>
+                                    <small id="scoreLabel">Optimal</small>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Info Cards -->
+                        <div style="flex: 1; display:flex; flex-direction:column; gap:0.5rem; justify-content: center;">
+                            <div class="info-tag-box" id="suitabilityBanner">Sowing Suitability: Optimal</div>
+                            <div class="info-tag-box secondary" id="alertBanner"><i class="fa-solid fa-triangle-exclamation"></i> Heavy Rain Alert</div>
+                        </div>
+                    </div>
+
+                    <!-- Interactive Checklist -->
+                    <div class="checklist-section" style="margin-top: 1.5rem;">
+                        <h3 style="font-size: 0.95rem; font-weight: 800; color: var(--blue); margin-bottom: 0.8rem;"><i class="fa-solid fa-list-check"></i> Sowing Action Checklist</h3>
+                        <div id="calChecklist" class="action-checklist"></div>
+                    </div>
+
+                    <!-- Advisory -->
+                    <div class="markdown-content" id="calAdvisory" style="margin-top: 1.5rem;"></div>
+                </div>
+
+                <!-- Standard Season Guide (Placeholder/Fallback state) -->
+                <div id="calStandardGuide">
+                    <div class="season-tabs">
+                        <button class="stab active" onclick="showSeason('kharif', this)"><i class="fa-solid fa-cloud-rain"></i> Kharif (खरीप)</button>
+                        <button class="stab" onclick="showSeason('rabi', this)"><i class="fa-solid fa-snowflake"></i> Rabi (रब्बी)</button>
+                        <button class="stab" onclick="showSeason('summer', this)"><i class="fa-solid fa-sun"></i> Summer (उन्हाळी)</button>
+                    </div>
+
+                    <!-- Kharif -->
+                    <div id="kharif" class="season-content">
+                        <div class="season-notice kharif-notice">
+                            <i class="fa-solid fa-info-circle"></i>
+                            <strong>Kharif (June - Nov):</strong> Sowing begins with monsoon. Check readiness above.
+                        </div>
+                        <div class="crop-cal-grid">
+                            <div class="crop-cal-card">
+                                <div class="crop-cal-header" style="background:#1a6b1a"><i class="fa-solid fa-leaf"></i> Cotton (कापूस)</div>
+                                <div class="crop-cal-body">
+                                    <div class="cal-row"><span>Sowing</span><span>June 1 - July 15</span></div>
+                                    <div class="cal-row"><span>Harvest</span><span>Oct - Feb</span></div>
+                                    <div class="cal-tip">Apply Nitrogen at 30 days.</div>
+                                </div>
+                            </div>
+                            <div class="crop-cal-card">
+                                <div class="crop-cal-header" style="background:#005580"><i class="fa-solid fa-circle"></i> Soybean (सोयाबीन)</div>
+                                <div class="crop-cal-body">
+                                    <div class="cal-row"><span>Sowing</span><span>June 15 - July 15</span></div>
+                                    <div class="cal-row"><span>Harvest</span><span>Oct - Nov</span></div>
+                                    <div class="cal-tip">treatment with Rhizobium culture helps yield.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Rabi -->
+                    <div id="rabi" class="season-content" style="display:none">
+                        <div class="season-notice rabi-notice">
+                            <i class="fa-solid fa-info-circle"></i>
+                            <strong>Rabi (Oct - March):</strong> Requires residual moisture or irrigation.
+                        </div>
+                        <div class="crop-cal-grid">
+                            <div class="crop-cal-card">
+                                <div class="crop-cal-header" style="background:#4a1080"><i class="fa-solid fa-wheat-awn"></i> Wheat (गहू)</div>
+                                <div class="crop-cal-body">
+                                    <div class="cal-row"><span>Sowing</span><span>Nov 1 - Dec 15</span></div>
+                                    <div class="cal-row"><span>Harvest</span><span>March - April</span></div>
+                                    <div class="cal-tip">Irrigation at Crown Root stage is critical.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Summer -->
+                    <div id="summer" class="season-content" style="display:none">
+                        <div class="season-notice summer-notice">
+                            <i class="fa-solid fa-info-circle"></i>
+                            <strong>Summer (Feb - May):</strong> Highly irrigation dependent.
+                        </div>
+                        <div class="crop-cal-grid">
+                            <div class="crop-cal-card">
+                                <div class="crop-cal-header" style="background:#b35900"><i class="fa-solid fa-pepper-hot"></i> Groundnut (भुईमूग)</div>
+                                <div class="crop-cal-body">
+                                    <div class="cal-row"><span>Sowing</span><span>Jan 15 - Feb 28</span></div>
+                                    <div class="cal-row"><span>Harvest</span><span>May - June</span></div>
+                                    <div class="cal-tip">Gypsum helps pod filling.</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -135,48 +179,177 @@
 {% endblock %}
 
 {% block extra_css %}
-.cal-page { max-width: 1100px; }
-.season-tabs { display: flex; gap: 0.8rem; margin: 1.5rem 0 1rem; flex-wrap: wrap; }
-.stab {
-    padding: 0.6rem 1.2rem; background: var(--surface);
-    border: 1px solid var(--border); border-radius: 8px;
-    cursor: pointer; font-weight: 600; font-size: 0.88rem;
-    color: var(--muted); display: flex; align-items: center; gap: 0.5rem;
-    transition: 0.2s; font-family: inherit;
-}
-.stab.active, .stab:hover { background: var(--blue); color: white; border-color: var(--blue); }
-.season-notice {
-    padding: 0.8rem 1rem; border-radius: 8px;
-    font-size: 0.88rem; margin-bottom: 1.2rem;
-    display: flex; align-items: flex-start; gap: 0.7rem;
-}
-.kharif-notice { background: rgba(26, 107, 26, 0.1); border: 1px solid rgba(26, 107, 26, 0.3); color: #2ea043; }
-.rabi-notice { background: rgba(74, 16, 128, 0.1); border: 1px solid rgba(74, 16, 128, 0.3); color: #d2a8ff; }
-.summer-notice { background: rgba(179, 89, 0, 0.1); border: 1px solid rgba(179, 89, 0, 0.3); color: #ffa657; }
-.crop-cal-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-    gap: 1.2rem;
-}
-.crop-cal-card { background: var(--surface); border-radius: 10px; overflow: hidden; border: 1px solid var(--border); box-shadow: var(--shadow); }
-.crop-cal-header { padding: 0.8rem 1rem; color: white; font-weight: 700; font-size: 0.88rem; display: flex; align-items: center; gap: 0.6rem; }
-.crop-cal-body { padding: 1rem; }
-.cal-row { display: flex; justify-content: space-between; align-items: flex-start; padding: 0.4rem 0; border-bottom: 1px dashed var(--border); font-size: 0.83rem; gap: 0.5rem; }
-.cal-label { color: var(--muted); font-weight: 500; flex-shrink: 0; }
-.cal-val { text-align: right; font-weight: 600; color: var(--text); }
-.kharif-chip { color: #2ea043; background: rgba(26, 107, 26, 0.1); padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid rgba(26, 107, 26, 0.3); }
-.rabi-chip { color: #d2a8ff; background: rgba(74, 16, 128, 0.1); padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid rgba(74, 16, 128, 0.3); }
-.summer-chip { color: #ffa657; background: rgba(179, 89, 0, 0.1); padding: 0.15rem 0.5rem; border-radius: 4px; border: 1px solid rgba(179, 89, 0, 0.3); }
-.cal-tip { margin-top: 0.8rem; background: var(--bg); border-left: 3px solid var(--orange); padding: 0.5rem 0.7rem; font-size: 0.8rem; color: var(--text); line-height: 1.5; border-radius: 0 4px 4px 0; }
+.calendar-container { height: calc(100vh - 120px); display: flex; flex-direction: column; gap: 1rem; overflow: hidden; }
+.dash-header { display: flex; justify-content: space-between; align-items: center; padding-bottom: 0.5rem; border-bottom: 1px solid var(--border); }
+.dash-title h2 { font-size: 1.3rem; font-weight: 800; color: var(--text); }
+.dash-title p { font-size: 0.82rem; color: var(--muted); margin-top: 0.2rem; }
+
+.calendar-grid { display: grid; grid-template-columns: 360px 1fr; gap: 1.2rem; flex: 1; overflow: hidden; }
+.dash-card { background: var(--surface); border: 1px solid var(--border); border-radius: 16px; display: flex; flex-direction: column; overflow: hidden; box-shadow: var(--shadow); }
+.card-header { background: var(--bg); padding: 0.8rem 1.2rem; font-weight: 700; color: var(--text); font-size: 0.85rem; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 0.6rem; }
+.card-body { flex: 1; padding: 1.5rem; position: relative; overflow: hidden; }
+.scroll-y { overflow-y: auto; scrollbar-width: thin; scrollbar-color: var(--border) transparent; }
+.scroll-y::-webkit-scrollbar { width: 6px; }
+.scroll-y::-webkit-scrollbar-thumb { background-color: var(--border); border-radius: 10px; }
+
+.input-group label { font-size: 0.8rem; font-weight: 700; color: var(--muted); margin-bottom: 0.4rem; display: block; }
+.input-group select { width: 100%; padding: 0.75rem; border: 1.5px solid var(--border); border-radius: 10px; background: var(--bg); color: var(--text); font-family: inherit; font-size: 0.9rem; }
+
+.btn-primary-dash { background: linear-gradient(135deg, var(--gov-orange), #ff6b6b); color: white; border: none; padding: 0.95rem; border-radius: 12px; font-weight: 800; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 0.7rem; transition: 0.2s; width: 100%; margin-top: 1.5rem; font-family: inherit; font-size: 0.92rem; }
+.btn-primary-dash:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(211,84,0,0.25); }
+
+.sow-helper-info { background: var(--nav-active-bg); border: 1px solid var(--blue); padding: 0.85rem; border-radius: 10px; font-size: 0.78rem; color: var(--blue); line-height: 1.45; }
+
+/* AI Output Styles */
+.planner-metrics { display: flex; gap: 1.5rem; background: var(--bg); border: 1px solid var(--border); border-radius: 16px; padding: 1.2rem; flex-wrap: wrap; }
+.score-gauge-wrap { display: flex; justify-content: center; align-items: center; }
+.score-circle-outer { width: 105px; height: 105px; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: 0.3s; background: conic-gradient(#10b981 0% 85%, var(--border) 85% 100%); }
+.score-circle-inner { width: 85px; height: 85px; background: var(--surface); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; }
+.score-circle-inner span { font-size: 1.4rem; font-weight: 900; color: var(--text); }
+.score-circle-inner small { font-size: 0.65rem; font-weight: 700; color: var(--muted); text-transform: uppercase; }
+
+.info-tag-box { background: #dcfce7; color: #166534; padding: 0.6rem 1rem; border-radius: 10px; font-size: 0.82rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem; }
+.info-tag-box.secondary { background: #fee2e2; color: #991b1b; }
+
+.action-checklist { display: flex; flex-direction: column; gap: 0.6rem; }
+.check-item { display: flex; align-items: center; gap: 0.7rem; background: var(--bg); border: 1px solid var(--border); padding: 0.75rem 1rem; border-radius: 10px; font-size: 0.85rem; font-weight: 600; color: var(--text); cursor: pointer; transition: 0.2s; }
+.check-item:hover { border-color: var(--blue); }
+.check-item input[type="checkbox"] { width: 16px; height: 16px; accent-color: var(--blue); }
+.check-item.done { opacity: 0.6; text-decoration: line-through; border-color: var(--border); }
+
+.season-tabs { display: flex; gap: 0.6rem; margin-bottom: 1.2rem; }
+.stab { padding: 0.5rem 1rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; cursor: pointer; font-weight: 700; font-size: 0.82rem; color: var(--muted); font-family: inherit; transition: 0.2s; }
+.stab.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+.season-notice { padding: 0.8rem 1rem; border-radius: 8px; font-size: 0.82rem; margin-bottom: 1.2rem; display: flex; align-items: center; gap: 0.6rem; }
+.kharif-notice { background: rgba(22, 163, 74, 0.08); border: 1px solid rgba(22,163,74,0.2); color: #15803d; }
+.rabi-notice { background: rgba(59, 130, 246, 0.08); border: 1px solid rgba(59,130,246,0.2); color: #1d4ed8; }
+.summer-notice { background: rgba(249, 115, 22, 0.08); border: 1px solid rgba(249,115,22,0.2); color: #c2410c; }
+
+.crop-cal-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 1rem; }
+.crop-cal-card { background: var(--bg); border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
+.crop-cal-header { padding: 0.7rem 1rem; color: white; font-weight: 700; font-size: 0.82rem; }
+.crop-cal-body { padding: 0.85rem; }
+.cal-row { display: flex; justify-content: space-between; font-size: 0.8rem; border-bottom: 1px dashed var(--border); padding: 0.4rem 0; color: var(--text); }
+.cal-tip { background: var(--surface); border-left: 3px solid var(--orange); padding: 0.5rem; font-size: 0.75rem; color: var(--muted); margin-top: 0.6rem; border-radius: 0 4px 4px 0; }
+
+.dash-loader { display: flex; flex-direction: column; align-items: center; justify-content: center; height: 100%; min-height: 250px; gap: 1rem; color: var(--muted); }
+.pulse-ring { width: 50px; height: 50px; border: 4px solid var(--orange); border-radius: 50%; animation: pulse-anim 1.2s infinite; }
+@keyframes pulse-anim { 0% { transform: scale(0.6); opacity: 1; } 100% { transform: scale(1.4); opacity: 0; } }
+
+.markdown-content { font-size: 0.92rem; line-height: 1.8; color: var(--text); }
+.markdown-content h1 { font-size: 1.2rem; color: var(--blue); margin-bottom: 0.8rem; }
+.markdown-content h2 { font-size: 1rem; margin-top: 1.2rem; border-left: 3px solid var(--orange); padding: 0.4rem 0.8rem; background: var(--bg); border-radius: 0 6px 6px 0; }
+.markdown-content li { margin-bottom: 0.6rem; padding: 0.6rem; background: var(--bg); border: 1px solid var(--border); border-radius: 8px; list-style: none; }
+
+.lang-pill-selector { display: flex; background: var(--bg); padding: 3px; border-radius: 30px; border: 1px solid var(--border); }
+.lang-pill { border: none; background: none; padding: 0.4rem 1rem; border-radius: 25px; cursor: pointer; font-family: inherit; font-weight: 600; font-size: 0.8rem; transition: 0.3s; color: var(--muted); }
+.lang-pill.active { background: var(--blue); color: white; }
 {% endblock %}
 
 {% block extra_js %}
 <script>
-function showSeason(s) {
+let plannerLang = 'Marathi';
+
+function setPlannerLang(lang, el) {
+    plannerLang = lang;
+    document.querySelectorAll('.lang-pill-selector .lang-pill').forEach(b => b.classList.remove('active'));
+    el.classList.add('active');
+}
+
+function showSeason(s, btn) {
     document.querySelectorAll('.season-content').forEach(el => el.style.display = 'none');
     document.querySelectorAll('.stab').forEach(el => el.classList.remove('active'));
     document.getElementById(s).style.display = 'block';
-    event.target.closest('.stab').classList.add('active');
+    btn.classList.add('active');
+}
+
+async function calculateSowingWindow() {
+    const district = document.getElementById('sowDistrict').value;
+    const crop = document.getElementById('sowCrop').value;
+
+    document.getElementById('calLoader').style.display = 'flex';
+    document.getElementById('calAiOutput').style.display = 'none';
+    document.getElementById('calStandardGuide').style.display = 'none';
+
+    try {
+        const resp = await fetch(`/api/sowing-suitability?city=${district}&crop=${crop}&lang=${plannerLang}`);
+        const data = await resp.json();
+
+        document.getElementById('calLoader').style.display = 'none';
+        document.getElementById('calAiOutput').style.display = 'block';
+
+        // Update gauge score
+        const score = data.score || 70;
+        const circle = document.getElementById('scoreCircle');
+        const scoreVal = document.getElementById('scoreVal');
+        const scoreLabel = document.getElementById('scoreLabel');
+
+        scoreVal.innerText = `${score}%`;
+        scoreLabel.innerText = data.suitability || 'Moderate';
+
+        let color = '#10b981'; // Green
+        if (score < 50) color = '#ef4444'; // Red
+        else if (score < 75) color = '#f59e0b'; // Yellow
+        circle.style.background = `conic-gradient(${color} 0% ${score}%, var(--border) ${score}% 100%)`;
+
+        // Update suitability and alert banners
+        const suitBanner = document.getElementById('suitabilityBanner');
+        suitBanner.innerText = `Suitability: ${data.suitability || 'Good'}`;
+        suitBanner.style.background = score >= 75 ? '#dcfce7' : (score >= 50 ? '#fef3c7' : '#fee2e2');
+        suitBanner.style.color = score >= 75 ? '#166534' : (score >= 50 ? '#92400e' : '#991b1b');
+
+        const alertBanner = document.getElementById('alertBanner');
+        if (data.alerts && data.alerts.trim().toLowerCase() !== 'none' && data.alerts.trim() !== '') {
+            alertBanner.innerHTML = `<i class="fa-solid fa-triangle-exclamation"></i> ${data.alerts}`;
+            alertBanner.style.display = 'flex';
+        } else {
+            alertBanner.style.display = 'none';
+        }
+
+        // Render checklist
+        const checklistArea = document.getElementById('calChecklist');
+        checklistArea.innerHTML = '';
+        const list = data.checklist || [];
+        list.forEach((item, index) => {
+            const div = document.createElement('div');
+            div.className = 'check-item';
+            div.innerHTML = `
+                <input type="checkbox" id="chk_${index}" onchange="toggleCheck(this)">
+                <label for="chk_${index}" style="cursor:pointer; width:100%;">${item}</label>
+            `;
+            checklistArea.appendChild(div);
+        });
+
+        // Render detailed advisory
+        const advisoryArea = document.getElementById('calAdvisory');
+        if (typeof marked !== 'undefined') {
+            advisoryArea.innerHTML = marked.parse(data.advisory || '');
+        } else {
+            advisoryArea.innerText = data.advisory || '';
+        }
+
+        // Save consultation to local history
+        if (typeof logTransaction === 'function') {
+            logTransaction('Sowing Planner', `Sowing suitability for ${crop} in ${district}`, data.advisory);
+        }
+
+        document.getElementById('calResultArea').scrollTop = 0;
+
+    } catch (e) {
+        document.getElementById('calLoader').style.display = 'none';
+        document.getElementById('calStandardGuide').style.display = 'block';
+        alert(`Error: ${e.message}`);
+    }
+}
+
+function toggleCheck(checkbox) {
+    const parent = checkbox.closest('.check-item');
+    if (checkbox.checked) {
+        parent.classList.add('done');
+    } else {
+        parent.classList.remove('done');
+    }
 }
 </script>
 {% endblock %}

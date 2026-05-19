@@ -1,19 +1,68 @@
 {% extends "base.html" %}
+
 {% block title %}Agri Calculators | Maha-Advisory{% endblock %}
 
 {% block content %}
 <div class="calc-page">
     <div class="header-section">
-        <h2><i class="fa-solid fa-calculator" style="color:var(--gov-orange)"></i> Agricultural Calculators</h2>
-        <p>Free tools to help you plan your farm activities accurately and efficiently.</p>
+        <h2><i class="fa-solid fa-calculator" style="color:var(--gov-orange)"></i> Precision Agri Calculators</h2>
+        <p>Calculate seed rates, KCC loan repayments, and generate customized AI fertilizer recommendations based on soil types and target yields.</p>
     </div>
 
     <div class="calc-grid">
+        <!-- AI Fertilizer Optimizer (NEW!) -->
+        <div class="calc-card premium-card">
+            <div class="calc-header ai-header">
+                <i class="fa-solid fa-wand-magic-sparkles"></i> AI Precision NPK Optimizer
+            </div>
+            <div class="calc-body">
+                <div class="form-group">
+                    <label>Crop Type</label>
+                    <select id="aiCrop">
+                        <option value="soybean">Soybean (सोयाबीन)</option>
+                        <option value="cotton">Cotton (कापूस)</option>
+                        <option value="wheat">Wheat (गहू)</option>
+                        <option value="onion">Onion (कांदा)</option>
+                        <option value="sugarcane">Sugarcane (ऊस)</option>
+                        <option value="rice">Rice (भात)</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Soil Type</label>
+                    <select id="aiSoil">
+                        <option value="Black Cotton">Black Cotton Soil (काळी कसदार जमीन)</option>
+                        <option value="Loamy">Loamy Soil (दुमट माती)</option>
+                        <option value="Sandy">Sandy Soil (वाळूयुक्त माती)</option>
+                        <option value="Clayey">Clayey Soil (चिकनमाती)</option>
+                        <option value="Red Laterite">Red Laterite Soil (तांबडी माती)</option>
+                    </select>
+                </div>
+                <div class="form-row">
+                    <div class="form-group">
+                        <label>Target Yield (Quintals/Acre)</label>
+                        <input type="number" id="aiYield" placeholder="e.g. 12" min="1" step="0.5" value="10">
+                    </div>
+                    <div class="form-group">
+                        <label>Irrigation Type</label>
+                        <select id="aiIrrigation">
+                            <option value="Drip">Drip Irrigation (ठिबक सिंचन)</option>
+                            <option value="Sprinkler">Sprinkler (तुषार सिंचन)</option>
+                            <option value="Flood/Canal">Flood/Canal (पाटपाणी)</option>
+                            <option value="Rainfed">Rainfed (जिरायती/पावसावर)</option>
+                        </select>
+                    </div>
+                </div>
+                <button class="calc-btn premium-btn" onclick="calcAiFertilizer()">
+                    Optimize with AI <i class="fa-solid fa-microchip"></i>
+                </button>
+                <div id="aiResult" class="result-area markdown-content" style="display:none; max-height:350px; overflow-y:auto;"></div>
+            </div>
+        </div>
 
         <!-- Fertilizer Calculator -->
         <div class="calc-card">
             <div class="calc-header fert-header">
-                <i class="fa-solid fa-flask"></i> Fertilizer Calculator (NPK)
+                <i class="fa-solid fa-flask"></i> NPK Standard Calculator
             </div>
             <div class="calc-body">
                 <div class="form-group">
@@ -30,7 +79,7 @@
                         <option value="sugarcane">Sugarcane (ऊस)</option>
                     </select>
                 </div>
-                <button class="calc-btn" onclick="calcFertilizer()">Calculate</button>
+                <button class="calc-btn" onclick="calcFertilizer()">Calculate Standard</button>
                 <div id="fertResult" class="result-area" style="display:none"></div>
             </div>
         </div>
@@ -89,19 +138,28 @@
 {% endblock %}
 
 {% block extra_css %}
-.calc-page { max-width: 1100px; }
+.calc-page { max-width: 1100px; margin: 0 auto; }
+.header-section { border-bottom: 1px solid var(--border); padding-bottom: 1rem; margin-bottom: 1rem; }
+.header-section h2 { font-size: 1.4rem; font-weight: 800; color: var(--text); display: flex; align-items: center; gap: 0.5rem; }
+.header-section p { color: var(--muted); font-size: 0.85rem; margin-top: 0.2rem; }
+
 .calc-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(340px, 1fr));
     gap: 1.5rem;
     margin-top: 1.5rem;
 }
 .calc-card {
     background: var(--surface);
-    border-radius: 12px;
+    border-radius: 16px;
     border: 1px solid var(--border);
     box-shadow: var(--shadow);
     overflow: hidden;
+    display: flex;
+    flex-direction: column;
+}
+.premium-card {
+    border: 2px solid var(--blue);
 }
 .calc-header {
     padding: 1rem 1.2rem;
@@ -112,45 +170,65 @@
     align-items: center;
     gap: 0.7rem;
 }
+.ai-header { background: linear-gradient(135deg, var(--gov-orange), #ff7a18); }
 .fert-header { background: linear-gradient(135deg, #1a6b1a, #2d9e2d); }
 .seed-header { background: linear-gradient(135deg, #005580, #0077b6); }
 .loan-header { background: linear-gradient(135deg, #7d4200, #c07000); }
-.calc-body { padding: 1.2rem; }
+.calc-body { padding: 1.2rem; flex: 1; display: flex; flex-direction: column; }
+.form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 0.8rem; }
 .form-group { margin-bottom: 1rem; }
-.form-group label { display: block; font-size: 0.82rem; font-weight: 600; color: var(--muted); margin-bottom: 0.4rem; }
+.form-group label { display: block; font-size: 0.82rem; font-weight: 700; color: var(--muted); margin-bottom: 0.4rem; }
 .form-group input, .form-group select {
-    width: 100%; padding: 0.6rem 0.8rem;
-    border: 1px solid var(--border); border-radius: 8px;
+    width: 100%; padding: 0.7rem 0.8rem;
+    border: 1.5px solid var(--border); border-radius: 10px;
     font-size: 0.9rem; font-family: inherit;
-    transition: border-color 0.2s;
+    transition: 0.2s;
     background: var(--bg); color: var(--text);
 }
 .form-group input:focus, .form-group select:focus {
     border-color: var(--blue); outline: none;
-    box-shadow: 0 0 0 3px rgba(26, 86, 219, 0.1);
 }
 .form-group small { display: block; margin-top: 0.3rem; font-size: 0.75rem; color: var(--muted); }
+
 .calc-btn {
-    width: 100%; padding: 0.75rem;
-    background: var(--blue); color: white;
-    border: none; border-radius: 8px;
-    font-size: 0.95rem; font-weight: 700;
+    width: 100%; padding: 0.8rem;
+    background: var(--bg); color: var(--blue);
+    border: 1px solid var(--border); border-radius: 10px;
+    font-size: 0.9rem; font-weight: 700;
     cursor: pointer; transition: 0.2s;
     font-family: inherit;
 }
-.calc-btn:hover { opacity: 0.9; transform: translateY(-1px); }
+.calc-btn:hover { background: var(--blue); color: white; border-color: var(--blue); }
+
+.premium-btn {
+    background: var(--blue); color: white; border-color: var(--blue);
+}
+.premium-btn:hover {
+    background: #0055bb;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 15px rgba(26, 86, 219, 0.2);
+}
+
 .result-area {
     margin-top: 1rem;
     background: var(--bg);
     border: 1px solid var(--border);
-    border-radius: 8px;
+    border-radius: 10px;
     padding: 1rem;
-    font-size: 0.88rem;
+    font-size: 0.85rem;
     line-height: 1.7;
     color: var(--text);
+    scrollbar-width: thin;
 }
-.result-row { display: flex; justify-content: space-between; padding: 0.3rem 0; border-bottom: 1px dashed var(--border); }
+.result-area::-webkit-scrollbar { width: 5px; }
+.result-area::-webkit-scrollbar-thumb { background: var(--border); border-radius: 4px; }
+
+.result-row { display: flex; justify-content: space-between; padding: 0.4rem 0; border-bottom: 1px dashed var(--border); }
 .result-row:last-child { border-bottom: none; font-weight: 700; color: var(--blue); }
+
+.markdown-content h1 { font-size: 1.1rem; color: var(--blue); margin-bottom: 0.6rem; border-bottom: 1px solid var(--border); padding-bottom: 0.3rem; }
+.markdown-content h2 { font-size: 0.95rem; color: var(--text); margin-top: 1rem; margin-bottom: 0.4rem; display: flex; align-items: center; gap: 0.4rem; }
+.markdown-content li { margin-left: 1.1rem; margin-bottom: 0.3rem; list-style-type: disc; }
 {% endblock %}
 
 {% block extra_js %}
@@ -224,6 +302,52 @@ function calcLoan() {
         <div class="result-row"><span>Total Interest</span><span>Rs. ${Math.round(interest).toLocaleString()}</span></div>
         <div class="result-row"><span>Total Repayment</span><span>Rs. ${Math.round(total).toLocaleString()}</span></div>
     `;
+}
+
+async function calcAiFertilizer() {
+    const crop = document.getElementById('aiCrop').value;
+    const soil = document.getElementById('aiSoil').value;
+    const yieldAmt = document.getElementById('aiYield').value;
+    const irrigation = document.getElementById('aiIrrigation').value;
+    const res = document.getElementById('aiResult');
+    
+    // Read global language
+    const currentLang = localStorage.getItem('pref_lang') === 'mr' ? 'Marathi' : (localStorage.getItem('pref_lang') === 'hi' ? 'Hindi' : 'English');
+
+    res.style.display = 'block';
+    res.innerHTML = `<div style="text-align:center; padding:1rem;"><i class="fa-solid fa-spinner fa-spin"></i> Generating custom split fertilizer schedule...</div>`;
+
+    try {
+        const resp = await fetch('/api/fertilizer-advisor', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                crop: crop,
+                soil_type: soil,
+                target_yield: yieldAmt,
+                irrigation: irrigation,
+                language: currentLang
+            })
+        });
+        const data = await resp.json();
+        
+        if (data.advice) {
+            if (typeof marked !== 'undefined') {
+                res.innerHTML = marked.parse(data.advice);
+            } else {
+                res.innerText = data.advice;
+            }
+            
+            // Log to local history
+            if (typeof logTransaction === 'function') {
+                logTransaction('Fertilizer Optimizer', `AI Nutrition for ${crop} in ${soil} soil`, data.advice);
+            }
+        } else {
+            res.innerText = 'Unable to compute optimize plan.';
+        }
+    } catch(e) {
+        res.innerHTML = `<span style="color:red">Error: ${e.message}</span>`;
+    }
 }
 </script>
 {% endblock %}

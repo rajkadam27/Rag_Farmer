@@ -168,6 +168,10 @@ async function handleVoiceQuery(query) {
         document.getElementById('voiceResult').innerHTML = html;
         document.getElementById('voiceResultArea').scrollTop = 0;
 
+        if (typeof logTransaction === 'function') {
+            logTransaction('Voice Assistant', query, data.answer);
+        }
+
         // Speak back
         speakText(data.answer, lang);
 

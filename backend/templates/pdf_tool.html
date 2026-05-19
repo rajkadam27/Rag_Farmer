@@ -245,6 +245,10 @@ async function processPdf() {
             resultEl.innerText = data.summary;
         }
 
+        if (typeof logTransaction === 'function') {
+            logTransaction('PDF Analysis', `AI summary for document: ${fileInput.files[0].name}`, data.summary);
+        }
+
         // Display follow-up chat box if document has extractable text
         if (currentPdfContext.trim().length > 0) {
             document.getElementById('pdfChatSection').style.display = 'block';

@@ -508,6 +508,16 @@
                 <i class="fa-solid fa-microphone" style="color: var(--orange);"></i> Voice Assistant
             </a>
 
+            <div class="nav-divider"></div>
+            <div class="nav-section">RAG Intelligence</div>
+
+            <a href="/gr-portal" class="nav-item {% if active_page == 'gr' %}active{% endif %}">
+                <i class="fa-solid fa-gavel" style="color: #d97706;"></i> GR RAG Portal
+            </a>
+            <a href="/mandi-arbitrage" class="nav-item {% if active_page == 'arbitrage' %}active{% endif %}">
+                <i class="fa-solid fa-scale-balanced" style="color: #16a34a;"></i> Mandi Arbitrage
+            </a>
+
         </nav>
     </aside>
 
@@ -619,6 +629,24 @@
                 link.addEventListener('click', closeNav);
             });
         })();
+
+        /* ── Global Transaction Logger for History ── */
+        function logTransaction(type, query, result) {
+            try {
+                let logs = JSON.parse(localStorage.getItem('farmer_adv_logs') || '[]');
+                logs.unshift({
+                    date: new Date().toLocaleDateString('en-IN', {day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit'}),
+                    type: type,
+                    query: query,
+                    result: result,
+                    language: document.getElementById('topLang')?.value === 'mr' ? 'Marathi' : (document.getElementById('topLang')?.value === 'hi' ? 'Hindi' : 'English')
+                });
+                if (logs.length > 30) logs.pop(); // Keep last 30 logs
+                localStorage.setItem('farmer_adv_logs', JSON.stringify(logs));
+            } catch (e) {
+                console.error('Error logging transaction:', e);
+            }
+        }
 
         window.addEventListener('resize', () => {
             if (window.innerWidth > 1024) closeNav();

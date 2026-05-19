@@ -51,6 +51,9 @@ class LiteCollection:
 # Initialise collections
 agronomy_collection = LiteCollection("agronomy")
 schemes_collection = LiteCollection("schemes")
+gr_collection = LiteCollection("government_resolutions")
+mandi_trends_collection = LiteCollection("mandi_trends")
 
 def query_collection(collection, query_embedding, n_results=5):
     return collection.query(query_embedding, n_results=n_results)
+
